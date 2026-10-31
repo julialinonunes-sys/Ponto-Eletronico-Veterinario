@@ -4,8 +4,22 @@
   "display": "standalone",
   "name": "Ponto Eletrônico - HOVET",
   "orientation": "any",
-  "scope": "/",
+  "scope": "./",
   "short_name": "Ponto Eletrônico",
-  "start_url": "/",
-  "theme_color": "#ffffff"
+  "start_url": "./index.html",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
