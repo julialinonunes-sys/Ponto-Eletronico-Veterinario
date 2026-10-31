@@ -110,7 +110,7 @@
                 </button>
                 <button id="tabBtnCoordination" onclick="switchTab('coordination')" class="px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 text-white/80 hover:bg-white/10 hover:text-white">
                     <i class="fa-solid fa-user-shield"></i>
-                    Painel Coordenação
+                    <span id="navCoordinationLabel">Painel Relatório / Coordenação</span>
                 </button>
             </nav>
 
@@ -271,20 +271,20 @@
             </div>
         </div>
 
-        <!-- ABA 2: PAINEL DA COORDENAÇÃO -->
+        <!-- ABA 2: PAINEL DA COORDENAÇÃO / RELATÓRIO MENSAL -->
         <div id="tabCoordination" class="space-y-6 hidden">
             
             <!-- NAVEGAÇÃO INTERNA DA COORDENAÇÃO -->
             <div class="flex border-b border-slate-200 gap-4">
                 <button id="coordSubTabBtnReports" onclick="switchCoordSubTab('reports')" class="pb-3 border-b-2 border-ufmt-800 font-bold text-ufmt-800 text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-chart-pie"></i> Relatórios Mensais & Horas
+                    <i class="fa-solid fa-chart-pie"></i> Relatório Mensal & Horas
                 </button>
                 <button id="coordSubTabBtnVets" onclick="switchCoordSubTab('vets')" class="pb-3 border-b-2 border-transparent font-medium text-slate-500 hover:text-slate-800 text-sm flex items-center gap-2">
                     <i class="fa-solid fa-user-doctor"></i> Cadastro de Médicos Veterinários
                 </button>
             </div>
 
-            <!-- SUB-ABA 1: RELATÓRIOS MENSAIS E HORAS -->
+            <!-- SUB-ABA 1: RELATÓRIOS MENSAIS E HORAS (LINHA HORIZONTAL POR DIA) -->
             <div id="coordSubTabReports" class="space-y-6">
                 <!-- PAINEL DE FILTROS DA COORDENAÇÃO -->
                 <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
@@ -298,7 +298,7 @@
                             <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Mês / Ano Referência</label>
                             <input type="month" id="coordFilterMonth" onchange="updateCoordinationDashboard()" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-ufmt-600 focus:outline-none">
                         </div>
-                        <div>
+                        <div id="filterVetContainer">
                             <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Médico / Colaborador</label>
                             <select id="coordFilterVet" onchange="updateCoordinationDashboard()" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-ufmt-600 focus:outline-none">
                                 <option value="ALL">Todos os Profissionais</option>
@@ -355,24 +355,25 @@
                     </div>
                 </div>
 
-                <!-- TABELA COMPLETA DA COORDENAÇÃO -->
+                <!-- TABELA DE RELATÓRIO COM PONTOS SEGUIDOS NA MESMA LINHA POR DIA -->
                 <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
-                    <h3 class="text-base font-bold text-slate-800">Registros do Mês Selecionado</h3>
+                    <h3 class="text-base font-bold text-slate-800">Consolidado Diário (Pontos na Mesma Linha)</h3>
 
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm text-slate-600">
                             <thead class="bg-slate-50 text-slate-500 uppercase text-xs font-semibold">
                                 <tr>
                                     <th class="px-4 py-3">Profissional</th>
-                                    <th class="px-4 py-3">Data / Hora</th>
-                                    <th class="px-4 py-3">Ponto</th>
-                                    <th class="px-4 py-3">Motivo / Justificativa</th>
-                                    <th class="px-4 py-3">Obs.</th>
-                                    <th class="px-4 py-3">GPS / Local</th>
+                                    <th class="px-4 py-3">Data</th>
+                                    <th class="px-4 py-3">Entrada</th>
+                                    <th class="px-4 py-3">Saída Almoço</th>
+                                    <th class="px-4 py-3">Retorno Almoço</th>
+                                    <th class="px-4 py-3">Saída</th>
+                                    <th class="px-4 py-3">Plantão (Início / Fim)</th>
                                 </tr>
                             </thead>
                             <tbody id="coordLogsTable" class="divide-y divide-slate-100">
-                                <!-- Inserido via Firestore -->
+                                <!-- Inserido via script com agrupamento por dia -->
                             </tbody>
                         </table>
                     </div>
@@ -596,7 +597,6 @@
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 
-        // Sua configuração do Firebase inserida
         const firebaseConfig = {
             apiKey: "AIzaSyD5mImW9kE7KAiaO9vAB9A-A5nxcjcBffs",
             authDomain: "ponto-eletronico-hovet.firebaseapp.com",
@@ -607,13 +607,11 @@
             measurementId: "G-639DLJ96XF"
         };
 
-        // Inicialização do Firebase
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Disponibiliza as instâncias e funções globalmente para o escopo das funções antigas do HTML
         window.firebaseAuth = auth;
         window.firebaseDb = db;
         window.signInWithEmailAndPassword = signInWithEmailAndPassword;
@@ -631,7 +629,6 @@
         window.onSnapshot = onSnapshot;
         window.orderBy = orderBy;
 
-        // Dispara o evento de carregamento do app após o Firebase inicializar
         window.dispatchEvent(new Event('firebase-ready'));
     </script>
 
@@ -654,7 +651,6 @@
             const monthInput = document.getElementById('coordFilterMonth');
             if(monthInput) monthInput.value = yearMonth;
 
-            // Observador de Autenticação
             window.onAuthStateChanged(window.firebaseAuth, async (user) => {
                 if (user) {
                     const q = window.query(window.collection(window.firebaseDb, 'vets'), window.where('email', '==', user.email));
@@ -690,524 +686,3 @@
             updateClock();
             setInterval(updateClock, 1000);
         }
-
-        function updateClock() {
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('pt-BR');
-            const dateOptions = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
-            const dateStr = now.toLocaleDateString('pt-BR', dateOptions);
-
-            const clockEl = document.getElementById('liveClock');
-            const dateEl = document.getElementById('liveDate');
-            if(clockEl) clockEl.textContent = timeStr;
-            if(dateEl) dateEl.textContent = dateStr;
-        }
-
-        function initGeolocation() {
-            const statusBox = document.getElementById('geoStatusBox');
-            const statusText = document.getElementById('geoStatusText');
-            const geoIcon = document.getElementById('geoIcon');
-
-            if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const lat = position.coords.latitude.toFixed(6);
-                        const lng = position.coords.longitude.toFixed(6);
-                        currentGeoLocation = { lat: lat, lng: lng, text: `${lat}, ${lng}` };
-
-                        if(statusText) statusText.textContent = `Localização capturada: Lat ${lat}, Lng ${lng} (Precisão ok)`;
-                        if(statusBox) statusBox.className = "bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between shadow-sm";
-                        if(geoIcon) {
-                            geoIcon.className = "w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-lg font-bold";
-                            geoIcon.innerHTML = `<i class="fa-solid fa-location-dot"></i>`;
-                        }
-                    },
-                    (error) => {
-                        currentGeoLocation = { lat: null, lng: null, text: "GPS Indisponível/Negado" };
-                        if(statusText) statusText.textContent = "Aviso: Não foi possível obter o GPS exato.";
-                        if(statusBox) statusBox.className = "bg-rose-50 border border-rose-200 rounded-2xl p-4 flex items-center justify-between shadow-sm";
-                        if(geoIcon) {
-                            geoIcon.className = "w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center text-lg font-bold";
-                            geoIcon.innerHTML = `<i class="fa-solid fa-location-crosshairs"></i>`;
-                        }
-                    },
-                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-                );
-            } else {
-                currentGeoLocation = { lat: null, lng: null, text: "Navegador sem suporte a GPS" };
-            }
-        }
-
-        async function handleLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value;
-
-            try {
-                await window.signInWithEmailAndPassword(window.firebaseAuth, email, password);
-                document.getElementById('loginError').classList.add('hidden');
-                document.getElementById('loginForm').reset();
-                showToast("Login realizado com sucesso!", "success");
-            } catch (error) {
-                console.error("Erro no login:", error);
-                showLoginError("E-mail ou senha incorretos!");
-            }
-        }
-
-        function showLoginError(msg) {
-            const errDiv = document.getElementById('loginError');
-            document.getElementById('loginErrorMessage').textContent = msg;
-            errDiv.classList.remove('hidden');
-        }
-
-        async function handleLogout() {
-            try {
-                await window.signOut(window.firebaseAuth);
-                currentUser = null;
-                isCoordUnlocked = false;
-                switchTab('register');
-                document.getElementById('loginScreen').classList.remove('hidden');
-                showToast("Sessão encerrada com sucesso.", "info");
-            } catch (error) {
-                console.error("Erro ao sair:", error);
-            }
-        }
-
-        function initAuthenticatedUser() {
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('currentUserDisplayName').textContent = currentUser.name;
-            document.getElementById('currentUserDisplayRole').textContent = `${currentUser.role} • ${currentUser.accessLevel || 'Colaborador'}`;
-
-            if (currentUser.accessLevel === "Coordenação") {
-                isCoordUnlocked = true;
-            }
-
-            syncVetDropdowns();
-            renderRecentLogs();
-        }
-
-        function loadVetsFromFirestore() {
-            window.onSnapshot(window.collection(window.firebaseDb, 'vets'), (snapshot) => {
-                vetList = [];
-                snapshot.forEach((docSnap) => {
-                    vetList.push({ id: docSnap.id, ...docSnap.data() });
-                });
-                syncVetDropdowns();
-                renderVetList();
-            }, (error) => {
-                console.error("Erro ao carregar veterinários:", error);
-            });
-        }
-
-        function loadLogsFromFirestore() {
-            const q = window.query(window.collection(window.firebaseDb, 'ponto_logs'), window.orderBy('timestamp', 'desc'));
-            window.onSnapshot(q, (snapshot) => {
-                logs = [];
-                snapshot.forEach((docSnap) => {
-                    logs.push({ id: docSnap.id, ...docSnap.data() });
-                });
-                renderRecentLogs();
-                if (!document.getElementById('tabCoordination').classList.contains('hidden')) {
-                    updateCoordinationDashboard();
-                }
-            }, (error) => {
-                console.error("Erro ao carregar logs:", error);
-            });
-        }
-
-        function syncVetDropdowns() {
-            const coordSelect = document.getElementById('coordFilterVet');
-            if (!coordSelect) return;
-            
-            coordSelect.innerHTML = '<option value="ALL">Todos os Profissionais</option>' +
-                vetList.map(v => `<option value="${v.name}">${v.name} (${v.role})</option>`).join('');
-        }
-
-        function openJustificationModal(type) {
-            if (!currentUser) {
-                document.getElementById('loginScreen').classList.remove('hidden');
-                return;
-            }
-
-            activePunchType = type;
-            document.getElementById('modalTitleType').textContent = `Registrar ${type}`;
-            document.getElementById('modalCurrentTime').textContent = new Date().toLocaleTimeString('pt-BR');
-            document.getElementById('modalGeoLocation').textContent = currentGeoLocation.text;
-            
-            document.getElementById('modalReasonCategory').value = "Sem alteração (No horário)";
-            document.getElementById('modalReasonNotes').value = "";
-
-            document.getElementById('justificationModal').classList.remove('hidden');
-        }
-
-        function closeJustificationModal() {
-            document.getElementById('justificationModal').classList.add('hidden');
-        }
-
-        async function confirmPunchRegistration(e) {
-            e.preventDefault();
-            const now = new Date();
-
-            const reasonCategory = document.getElementById('modalReasonCategory').value;
-            const notes = document.getElementById('modalReasonNotes').value.trim();
-
-            const newLog = {
-                vetName: currentUser.name,
-                vetRole: currentUser.role,
-                timestamp: now.toISOString(),
-                formattedDate: now.toLocaleDateString('pt-BR'),
-                formattedTime: now.toLocaleTimeString('pt-BR'),
-                type: activePunchType,
-                reasonCategory: reasonCategory,
-                notes: notes,
-                location: currentGeoLocation.text,
-                lat: currentGeoLocation.lat,
-                lng: currentGeoLocation.lng
-            };
-
-            try {
-                await window.addDoc(window.collection(window.firebaseDb, 'ponto_logs'), newLog);
-                closeJustificationModal();
-                showToast(`Ponto de ${activePunchType} registrado com sucesso na nuvem!`);
-            } catch (error) {
-                console.error("Erro ao registrar ponto:", error);
-                showToast("Erro ao registrar ponto no Firestore.", "warning");
-            }
-        }
-
-        function renderRecentLogs() {
-            const tbody = document.getElementById('recentLogsTable');
-            if (!currentUser || !tbody) return;
-
-            const myLogs = logs.filter(l => l.vetName === currentUser.name).slice(0, 5);
-
-            if (myLogs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-6 text-center text-slate-400">Nenhum registro efetuado.</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = myLogs.map(log => {
-                let badgeColor = "bg-slate-100 text-slate-700";
-                if (log.type.includes("Entrada")) badgeColor = "bg-emerald-100 text-emerald-800";
-                if (log.type.includes("Saída")) badgeColor = "bg-rose-100 text-rose-800";
-                if (log.type.includes("Almoço")) badgeColor = "bg-amber-100 text-amber-800";
-                if (log.type.includes("Plantão")) badgeColor = "bg-purple-100 text-purple-800";
-
-                const mapsUrl = (log.lat && log.lng) ? `https://www.google.com/maps?q=${log.lat},${log.lng}` : "#";
-
-                return `
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="px-4 py-3 font-mono text-xs font-semibold">
-                            ${log.formattedDate} <span class="text-slate-400 font-normal">${log.formattedTime}</span>
-                        </td>
-                        <td class="px-4 py-3">
-                            <span class="px-2.5 py-1 rounded-full text-xs font-bold ${badgeColor}">
-                                ${log.type}
-                            </span>
-                        </td>
-                        <td class="px-4 py-3 text-xs">
-                            <div class="font-semibold text-slate-700">${log.reasonCategory}</div>
-                            ${log.notes ? `<div class="text-slate-400 text-[11px] italic">${log.notes}</div>` : ''}
-                        </td>
-                        <td class="px-4 py-3 text-xs">
-                            ${(log.lat && log.lng) ? 
-                                `<a href="${mapsUrl}" target="_blank" class="text-ufmt-700 font-mono hover:underline flex items-center gap-1">
-                                    <i class="fa-solid fa-map-pin"></i> ${log.location}
-                                </a>` : 
-                                `<span class="text-slate-400">${log.location}</span>`}
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function updateCoordinationDashboard() {
-            const selectedMonth = document.getElementById('coordFilterMonth').value;
-            const selectedVet = document.getElementById('coordFilterVet').value;
-
-            const filteredLogs = logs.filter(log => {
-                const logMonth = log.timestamp ? log.timestamp.slice(0, 7) : "";
-                const matchMonth = selectedMonth ? logMonth === selectedMonth : true;
-                const matchVet = selectedVet !== "ALL" ? log.vetName === selectedVet : true;
-                return matchMonth && matchVet;
-            });
-
-            const tbody = document.getElementById('coordLogsTable');
-            if (!tbody) return;
-
-            if (filteredLogs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-6 text-center text-slate-400">Nenhum ponto registrado para os filtros selecionados.</td></tr>`;
-            } else {
-                tbody.innerHTML = filteredLogs.map(log => `
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="px-4 py-3 font-bold text-slate-800">${log.vetName} <br><span class="text-[10px] text-slate-400 font-normal">${log.vetRole}</span></td>
-                        <td class="px-4 py-3 font-mono text-xs">${log.formattedDate} ${log.formattedTime}</td>
-                        <td class="px-4 py-3">
-                            <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-800">${log.type}</span>
-                        </td>
-                        <td class="px-4 py-3 text-xs font-medium text-slate-700">${log.reasonCategory}</td>
-                        <td class="px-4 py-3 text-xs text-slate-500">${log.notes || '-'}</td>
-                        <td class="px-4 py-3 text-xs font-mono">${log.location}</td>
-                    </tr>
-                `).join('');
-            }
-
-            let totalMinutesRegular = 0;
-            let totalMinutesPlantao = 0;
-            let totalOcorrencias = 0;
-
-            filteredLogs.forEach(log => {
-                if (log.reasonCategory && log.reasonCategory !== "Sem alteração (No horário)") {
-                    totalOcorrencias++;
-                }
-                if (log.type === "Entrada Plantão") totalMinutesPlantao += 12 * 60;
-                if (log.type === "Entrada") totalMinutesRegular += 4 * 60;
-            });
-
-            document.getElementById('cardTotalRegular').textContent = formatMinutesToHHMM(totalMinutesRegular);
-            document.getElementById('cardTotalPlantao').textContent = formatMinutesToHHMM(totalMinutesPlantao);
-            document.getElementById('cardTotalOcorrencias').textContent = `${totalOcorrencias} ocorrências`;
-            document.getElementById('cardTotalGeral').textContent = formatMinutesToHHMM(totalMinutesRegular + totalMinutesPlantao);
-        }
-
-        function formatMinutesToHHMM(minutes) {
-            const hrs = Math.floor(minutes / 60);
-            const mins = minutes % 60;
-            return `${hrs}h ${mins.toString().padStart(2, '0')}m`;
-        }
-
-        function exportToCSV() {
-            const selectedMonth = document.getElementById('coordFilterMonth').value;
-            const selectedVet = document.getElementById('coordFilterVet').value;
-
-            const filtered = logs.filter(log => {
-                const logMonth = log.timestamp ? log.timestamp.slice(0, 7) : "";
-                const matchMonth = selectedMonth ? logMonth === selectedMonth : true;
-                const matchVet = selectedVet !== "ALL" ? log.vetName === selectedVet : true;
-                return matchMonth && matchVet;
-            });
-
-            if (filtered.length === 0) {
-                showToast("Sem dados para exportar no período selecionado.", "warning");
-                return;
-            }
-
-            let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Colaborador,Cargo,Data,Hora,Tipo de Ponto,Justificativa,Observacoes,GPS\n";
-
-            filtered.forEach(l => {
-                const row = [
-                    `"${l.vetName}"`,
-                    `"${l.vetRole}"`,
-                    `"${l.formattedDate}"`,
-                    `"${l.formattedTime}"`,
-                    `"${l.type}"`,
-                    `"${l.reasonCategory}"`,
-                    `"${l.notes || ''}"`,
-                    `"${l.location}"`
-                ].join(",");
-                csvContent += row + "\n";
-            });
-
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `PONTO_HOVET_UFMT_${selectedMonth || 'GERAL'}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        function renderVetList() {
-            const tbody = document.getElementById('vetListTable');
-            if (!tbody) return;
-
-            tbody.innerHTML = vetList.map(vet => `
-                <tr class="hover:bg-slate-50 transition">
-                    <td class="px-6 py-4 font-bold text-slate-800">${vet.name}</td>
-                    <td class="px-6 py-4 text-xs font-semibold text-ufmt-900">${vet.role}</td>
-                    <td class="px-6 py-4 text-xs font-bold ${vet.accessLevel === 'Coordenação' ? 'text-purple-700 bg-purple-50 px-2 py-1 rounded-md' : 'text-slate-600'}">${vet.accessLevel || 'Colaborador'}</td>
-                    <td class="px-6 py-4 text-xs font-mono text-slate-600">${vet.email || '<span class="text-slate-400">Não informado</span>'}</td>
-                    <td class="px-6 py-4">
-                        <span class="px-2.5 py-1 rounded-full text-xs font-bold ${vet.status === 'Ativo' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'}">
-                            ${vet.status}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 text-right space-x-2">
-                        <button onclick="editVet('${vet.id}')" class="text-ufmt-700 hover:text-ufmt-900 p-1.5 rounded-lg hover:bg-slate-100 transition" title="Editar">
-                            <i class="fa-solid fa-pen"></i>
-                        </button>
-                        <button onclick="deleteVet('${vet.id}')" class="text-rose-600 hover:text-rose-800 p-1.5 rounded-lg hover:bg-rose-50 transition" title="Remover">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        async function saveVetForm(e) {
-            e.preventDefault();
-            const docId = document.getElementById('vetFormDocId').value;
-            const name = document.getElementById('vetFormName').value.trim();
-            const role = document.getElementById('vetFormRole').value;
-            const accessLevel = document.getElementById('vetFormAccessLevel').value;
-            const email = document.getElementById('vetFormEmail').value.trim();
-            const password = document.getElementById('vetFormPassword').value;
-            const status = document.getElementById('vetFormStatus').value;
-
-            try {
-                if (docId) {
-                    const docRef = window.doc(window.firebaseDb, 'vets', docId);
-                    await window.updateDoc(docRef, { name, role, accessLevel, email, status });
-                    showToast("Cadastro atualizado com sucesso!", "success");
-                } else {
-                    await window.addDoc(window.collection(window.firebaseDb, 'vets'), { name, role, accessLevel, email, status });
-                    try {
-                        await window.createUserWithEmailAndPassword(window.firebaseAuth, email, password);
-                    } catch (authErr) {
-                        console.log("Aviso de Auth:", authErr);
-                    }
-                    showToast("Médico cadastrado com sucesso no Firebase!", "success");
-                }
-                resetVetForm();
-            } catch (error) {
-                console.error("Erro ao salvar veterinário:", error);
-                showToast("Erro ao salvar dados no Firebase.", "warning");
-            }
-        }
-
-        function editVet(id) {
-            const vet = vetList.find(v => v.id === id);
-            if (!vet) return;
-
-            document.getElementById('vetFormDocId').value = vet.id;
-            document.getElementById('vetFormName').value = vet.name;
-            document.getElementById('vetFormRole').value = vet.role;
-            document.getElementById('vetFormAccessLevel').value = vet.accessLevel || "Colaborador";
-            document.getElementById('vetFormEmail').value = vet.email || "";
-            document.getElementById('vetFormPassword').value = "********";
-            document.getElementById('vetFormStatus').value = vet.status;
-
-            document.getElementById('vetFormTitle').textContent = "Editar Cadastro de Veterinário";
-            document.getElementById('vetCancelBtn').classList.remove('hidden');
-        }
-
-        function deleteVet(id) {
-            vetIdToDelete = id;
-            document.getElementById('confirmDeleteModal').classList.remove('hidden');
-        }
-
-        async function confirmDeleteVet() {
-            if (vetIdToDelete !== null) {
-                try {
-                    await window.deleteDoc(window.doc(window.firebaseDb, 'vets', vetIdToDelete));
-                    showToast("Cadastro removido do Firestore com sucesso.");
-                } catch (error) {
-                    console.error("Erro ao excluir:", error);
-                    showToast("Erro ao remover cadastro.", "warning");
-                }
-            }
-            closeDeleteModal();
-        }
-
-        function closeDeleteModal() {
-            vetIdToDelete = null;
-            document.getElementById('confirmDeleteModal').classList.add('hidden');
-        }
-
-        function resetVetForm() {
-            document.getElementById('vetForm').reset();
-            document.getElementById('vetFormDocId').value = "";
-            document.getElementById('vetFormTitle').textContent = "Cadastrar Novo Médico / Colaborador";
-            document.getElementById('vetCancelBtn').classList.add('hidden');
-        }
-
-        function switchCoordSubTab(sub) {
-            const btnReports = document.getElementById('coordSubTabBtnReports');
-            const btnVets = document.getElementById('coordSubTabBtnVets');
-            const viewReports = document.getElementById('coordSubTabReports');
-            const viewVets = document.getElementById('coordSubTabVets');
-
-            if (sub === 'reports') {
-                btnReports.className = "pb-3 border-b-2 border-ufmt-800 font-bold text-ufmt-800 text-sm flex items-center gap-2";
-                btnVets.className = "pb-3 border-b-2 border-transparent font-medium text-slate-500 hover:text-slate-800 text-sm flex items-center gap-2";
-                viewReports.classList.remove('hidden');
-                viewVets.classList.add('hidden');
-                updateCoordinationDashboard();
-            } else {
-                btnVets.className = "pb-3 border-b-2 border-ufmt-800 font-bold text-ufmt-800 text-sm flex items-center gap-2";
-                btnReports.className = "pb-3 border-b-2 border-transparent font-medium text-slate-500 hover:text-slate-800 text-sm flex items-center gap-2";
-                viewVets.classList.remove('hidden');
-                viewReports.classList.add('hidden');
-                renderVetList();
-            }
-        }
-
-        function switchTab(tab) {
-            const tabReg = document.getElementById('tabRegister');
-            const tabCoord = document.getElementById('tabCoordination');
-
-            const btnReg = document.getElementById('tabBtnRegister');
-            const btnCoord = document.getElementById('tabBtnCoordination');
-
-            if (tab === 'coordination') {
-                if (currentUser && currentUser.accessLevel !== 'Coordenação' && !isCoordUnlocked) {
-                    document.getElementById('coordAuthModal').classList.remove('hidden');
-                    return;
-                }
-            }
-
-            btnReg.className = "px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 text-white/80 hover:bg-white/10 hover:text-white";
-            btnCoord.className = "px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 text-white/80 hover:bg-white/10 hover:text-white";
-
-            tabReg.classList.add('hidden');
-            tabCoord.classList.add('hidden');
-
-            if (tab === 'register') {
-                tabReg.classList.remove('hidden');
-                btnReg.className = "px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 bg-white text-ufmt-900 shadow";
-                renderRecentLogs();
-            } else if (tab === 'coordination') {
-                tabCoord.classList.remove('hidden');
-                btnCoord.className = "px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 bg-white text-ufmt-900 shadow";
-                updateCoordinationDashboard();
-                renderVetList();
-            }
-        }
-
-        function handleCoordAuthSubmit(e) {
-            e.preventDefault();
-            
-            if (currentUser && currentUser.accessLevel === 'Coordenação') {
-                isCoordUnlocked = true;
-                document.getElementById('coordAuthModal').classList.add('hidden');
-                document.getElementById('coordAuthPin').value = "";
-                document.getElementById('coordAuthError').classList.add('hidden');
-                
-                switchTab('coordination');
-                showToast("Acesso à Coordenação liberado!", "success");
-            } else {
-                document.getElementById('coordAuthError').classList.remove('hidden');
-            }
-        }
-
-        function closeCoordAuthModal() {
-            document.getElementById('coordAuthModal').classList.add('hidden');
-            document.getElementById('coordAuthPin').value = "";
-            document.getElementById('coordAuthError').classList.add('hidden');
-        }
-
-        function showToast(msg) {
-            const toast = document.getElementById('toastNotification');
-            const toastMessage = document.getElementById('toastMessage');
-            
-            toastMessage.textContent = msg;
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
-        }
-    </script>
-</body>
-</html>
