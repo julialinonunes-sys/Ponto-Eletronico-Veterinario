@@ -243,7 +243,7 @@
                 </div>
             </div>
 
-            <!-- REGISTROS DO DIA (HISTÓRICO LOCAL DO USUÁRIO LOGADO) -->
+            <!-- REGISTROS DO DIA (HISTÓRICO DO USUÁRIO LOGADO) -->
             <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
                 <div class="flex justify-between items-center">
                     <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
@@ -264,7 +264,7 @@
                             </tr>
                         </thead>
                         <tbody id="recentLogsTable" class="divide-y divide-slate-100">
-                            <!-- Inserido dinamicamente via JS -->
+                            <!-- Inserido dinamicamente via Firestore -->
                         </tbody>
                     </table>
                 </div>
@@ -302,7 +302,6 @@
                             <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Médico / Colaborador</label>
                             <select id="coordFilterVet" onchange="updateCoordinationDashboard()" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-ufmt-600 focus:outline-none">
                                 <option value="ALL">Todos os Profissionais</option>
-                                <!-- Inserido via JS -->
                             </select>
                         </div>
                         <div class="flex items-end gap-2">
@@ -347,7 +346,7 @@
 
                     <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center gap-4">
                         <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl">
-                            <i class="fa-solid fa-[#075985] text-emerald-700 fa-clock"></i>
+                            <i class="fa-solid fa-clock text-emerald-700"></i>
                         </div>
                         <div>
                             <span class="block text-xs font-bold uppercase text-slate-400">Carga Horária Geral</span>
@@ -373,7 +372,7 @@
                                 </tr>
                             </thead>
                             <tbody id="coordLogsTable" class="divide-y divide-slate-100">
-                                <!-- Inserido dinamicamente via JS -->
+                                <!-- Inserido via Firestore -->
                             </tbody>
                         </table>
                     </div>
@@ -386,7 +385,7 @@
                     <div class="flex justify-between items-center">
                         <div>
                             <h3 id="vetFormTitle" class="text-base font-bold text-slate-800">Cadastrar Novo Médico / Colaborador</h3>
-                            <p class="text-xs text-slate-500">Insira as informações do profissional para liberar o acesso ao sistema de ponto.</p>
+                            <p class="text-xs text-slate-500">Insira as informações do profissional para liberar o acesso ao sistema.</p>
                         </div>
                         <button id="vetCancelBtn" onclick="resetVetForm()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold rounded-lg hidden">
                             Cancelar Edição
@@ -394,7 +393,7 @@
                     </div>
 
                     <form id="vetForm" onsubmit="saveVetForm(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <input type="hidden" id="vetFormId">
+                        <input type="hidden" id="vetFormDocId">
                         
                         <div>
                             <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Nome Completo *</label>
@@ -421,11 +420,11 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold uppercase text-slate-400 mb-1">E-mail Inst.</label>
-                            <input type="email" id="vetFormEmail" placeholder="usuario@ufmt.br" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-ufmt-600 focus:outline-none">
+                            <label class="block text-xs font-bold uppercase text-slate-400 mb-1">E-mail Inst. *</label>
+                            <input type="email" id="vetFormEmail" required placeholder="usuario@ufmt.br" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-ufmt-600 focus:outline-none">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Senha de Acesso *</label>
+                            <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Senha de Acesso (Mín. 6 chars) *</label>
                             <input type="password" id="vetFormPassword" required placeholder="Digite a senha..." class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-ufmt-600 focus:outline-none">
                         </div>
                         <div>
@@ -438,7 +437,7 @@
                         <div class="flex items-end sm:col-span-2 lg:col-span-3 justify-end">
                             <button type="submit" class="w-full sm:w-auto px-6 py-2 bg-ufmt-800 hover:bg-ufmt-900 text-white font-semibold rounded-xl text-sm transition shadow flex items-center justify-center gap-2">
                                 <i class="fa-solid fa-save"></i>
-                                Salvar Cadastro
+                                Salvar no Firebase
                             </button>
                         </div>
                     </form>
@@ -446,7 +445,7 @@
 
                 <!-- QUADRO DE MÉDICOS CADASTRAIS -->
                 <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
-                    <h3 class="text-base font-bold text-slate-800">Quadro de Profissionais do HOVET</h3>
+                    <h3 class="text-base font-bold text-slate-800">Quadro de Profissionais do HOVET (Firestore)</h3>
 
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm text-slate-600">
@@ -456,13 +455,12 @@
                                     <th class="px-6 py-3">Cargo / Função</th>
                                     <th class="px-6 py-3">Nível de Acesso</th>
                                     <th class="px-6 py-3">E-mail Institucional</th>
-                                    <th class="px-6 py-3">Senha</th>
                                     <th class="px-6 py-3">Status</th>
                                     <th class="px-6 py-3 text-right">Ações</th>
                                 </tr>
                             </thead>
                             <tbody id="vetListTable" class="divide-y divide-slate-100">
-                                <!-- Populado via JS -->
+                                <!-- Populado via Firestore -->
                             </tbody>
                         </table>
                     </div>
@@ -475,7 +473,7 @@
     <!-- RODAPÉ DA PÁGINA -->
     <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 mt-auto">
         <p>Hospital Veterinário - HOVET | <strong>Universidade Federal de Mato Grosso (UFMT)</strong> - Campus Sinop</p>
-        <p class="mt-0.5 text-slate-400">Desenvolvido para controle de ponto e plantões cirúrgicos/clínicos.</p>
+        <p class="mt-0.5 text-slate-400">Desenvolvido com Firebase Auth & Firestore para controle de ponto e plantões.</p>
     </footer>
 
     <!-- MODAL DE JUSTIFICATIVA / OCORRÊNCIAS -->
@@ -537,7 +535,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE AUTENTICAÇÃO DA COORDENAÇÃO (SENHA PIN) -->
+    <!-- MODAL DE AUTENTICAÇÃO DA COORDENAÇÃO -->
     <div id="coordAuthModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 space-y-4 border border-slate-100 text-center">
             <div class="w-12 h-12 bg-amber-100 text-amber-700 rounded-2xl flex items-center justify-center text-xl font-bold mx-auto">
@@ -545,11 +543,11 @@
             </div>
             <div>
                 <h3 class="text-lg font-bold text-slate-900">Acesso Restrito à Coordenação</h3>
-                <p class="text-xs text-slate-500 mt-1">Digite a senha/PIN de segurança da coordenação para prosseguir.</p>
+                <p class="text-xs text-slate-500 mt-1">Digite sua senha administrativa para prosseguir.</p>
             </div>
             <form onsubmit="handleCoordAuthSubmit(event)" class="space-y-3">
-                <input type="password" id="coordAuthPin" placeholder="Senha de segurança..." required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-center text-slate-800 font-mono text-sm focus:ring-2 focus:ring-ufmt-600 focus:outline-none">
-                <div id="coordAuthError" class="hidden text-xs text-rose-600 font-semibold">Senha incorreta! Tente novamente.</div>
+                <input type="password" id="coordAuthPin" placeholder="Sua senha..." required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-center text-slate-800 font-mono text-sm focus:ring-2 focus:ring-ufmt-600 focus:outline-none">
+                <div id="coordAuthError" class="hidden text-xs text-rose-600 font-semibold">Senha incorreta ou sem privilégios!</div>
                 <div class="flex gap-2">
                     <button type="button" onclick="closeCoordAuthModal()" class="flex-1 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition">
                         Cancelar
@@ -562,7 +560,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE CONFIRMAÇÃO DE EXCLUSÃO (SEM ALERT/CONFIRM NATIVO) -->
+    <!-- MODAL DE CONFIRMAÇÃO DE EXCLUSÃO -->
     <div id="confirmDeleteModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 space-y-4 border border-slate-100 text-center">
             <div class="w-12 h-12 bg-rose-100 text-rose-700 rounded-2xl flex items-center justify-center text-xl font-bold mx-auto">
@@ -570,7 +568,7 @@
             </div>
             <div>
                 <h3 class="text-lg font-bold text-slate-900">Remover Profissional</h3>
-                <p class="text-xs text-slate-500 mt-1">Tem certeza que deseja remover o cadastro deste médico veterinário?</p>
+                <p class="text-xs text-slate-500 mt-1">Tem certeza que deseja remover o cadastro deste médico veterinário do Firestore?</p>
             </div>
             <div class="flex gap-2">
                 <button onclick="closeDeleteModal()" class="flex-1 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition">
@@ -583,7 +581,7 @@
         </div>
     </div>
 
-    <!-- TOAST DE NOTIFICAÇÃO DA INTERFACE -->
+    <!-- TOAST DE NOTIFICAÇÃO -->
     <div id="toastNotification" class="fixed bottom-4 right-4 z-50 transform translate-y-20 opacity-0 transition-all duration-300">
         <div id="toastContent" class="px-4 py-3 rounded-xl shadow-lg font-semibold text-sm flex items-center gap-2 bg-slate-900 text-white">
             <i class="fa-solid fa-circle-check text-emerald-400"></i>
@@ -591,55 +589,103 @@
         </div>
     </div>
 
-    <!-- LÓGICA JAVASCRIPT NATIVA -->
+    <!-- LÓGICA DO FIREBASE (MODULAR SDK) E APLICAÇÃO -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-analytics.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+
+        // Sua configuração do Firebase inserida
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5mImW9kE7KAiaO9vAB9A-A5nxcjcBffs",
+            authDomain: "ponto-eletronico-hovet.firebaseapp.com",
+            projectId: "ponto-eletronico-hovet",
+            storageBucket: "ponto-eletronico-hovet.firebasestorage.app",
+            messagingSenderId: "291977256870",
+            appId: "1:291977256870:web:a4d0027e5813dc411bb967",
+            measurementId: "G-639DLJ96XF"
+        };
+
+        // Inicialização do Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Disponibiliza as instâncias e funções globalmente para o escopo das funções antigas do HTML
+        window.firebaseAuth = auth;
+        window.firebaseDb = db;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+        window.signOut = signOut;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.getDocs = getDocs;
+        window.doc = doc;
+        window.updateDoc = updateDoc;
+        window.deleteDoc = deleteDoc;
+        window.query = query;
+        window.where = where;
+        window.onSnapshot = onSnapshot;
+        window.orderBy = orderBy;
+
+        // Dispara o evento de carregamento do app após o Firebase inicializar
+        window.dispatchEvent(new Event('firebase-ready'));
+    </script>
+
+    <!-- SCRIPT DE NEGÓCIO DA APLICAÇÃO -->
     <script>
-        // ================= ESTADO GLOBAL E STORAGE =================
         let currentGeoLocation = { lat: null, lng: null, text: "GPS não capturado" };
         let activePunchType = "";
-        let activePunchCategory = "";
         let vetIdToDelete = null;
         let currentUser = null;
         let isCoordUnlocked = false;
+        let vetList = [];
+        let logs = [];
 
-        // Recupera registros de ponto armazenados no localStorage
-        let logs = JSON.parse(localStorage.getItem('hovet_ponto_logs') || '[]');
-
-        // Dados Iniciais de Médicos Veterinários Cadastrados
-        const initialVets = [
-            { id: 1, name: "Dr. Roberto Alves", role: "Coordenador Veterinário", accessLevel: "Coordenação", email: "coord.hovet@ufmt.br", password: "admin", status: "Ativo" },
-            { id: 2, name: "Dra. Ana Silva", role: "Médica Veterinária", accessLevel: "Colaborador", email: "ana.silva@ufmt.br", password: "123", status: "Ativo" },
-            { id: 3, name: "Dr. Carlos Eduardo", role: "Cirurgião Veterinário", accessLevel: "Colaborador", email: "carlos.eduardo@ufmt.br", password: "123", status: "Ativo" },
-            { id: 4, name: "Dra. Juliana Lima", role: "Plantonista Veterinário", accessLevel: "Colaborador", email: "juliana.lima@ufmt.br", password: "123", status: "Ativo" },
-            { id: 5, name: "Mariana Costa", role: "Enfermeira Veterinária", accessLevel: "Colaborador", email: "mariana.costa@ufmt.br", password: "123", status: "Ativo" }
-        ];
-
-        let vetList = JSON.parse(localStorage.getItem('hovet_medicos_v1') || 'null');
-        if (!vetList) {
-            vetList = initialVets;
-            localStorage.setItem('hovet_medicos_v1', JSON.stringify(vetList));
-        }
-
-        // ================= INICIALIZAÇÃO DA APLICAÇÃO =================
-        window.onload = function() {
+        window.addEventListener('firebase-ready', () => {
             startClock();
             initGeolocation();
             
-            // Seta o mês atual nos relatórios
             const now = new Date();
             const yearMonth = now.toISOString().slice(0, 7);
-            document.getElementById('coordFilterMonth').value = yearMonth;
+            const monthInput = document.getElementById('coordFilterMonth');
+            if(monthInput) monthInput.value = yearMonth;
 
-            // Verifica sessão salva
-            const savedUser = localStorage.getItem('hovet_current_user');
-            if (savedUser) {
-                currentUser = JSON.parse(savedUser);
-                initAuthenticatedUser();
-            } else {
-                document.getElementById('loginScreen').classList.remove('hidden');
-            }
-        };
+            // Observador de Autenticação
+            window.onAuthStateChanged(window.firebaseAuth, async (user) => {
+                if (user) {
+                    const q = window.query(window.collection(window.firebaseDb, 'vets'), window.where('email', '==', user.email));
+                    const snapshot = await window.getDocs(q);
+                    if (!snapshot.empty) {
+                        const docData = snapshot.docs[0].data();
+                        currentUser = {
+                            id: snapshot.docs[0].id,
+                            uid: user.uid,
+                            ...docData
+                        };
+                    } else {
+                        currentUser = {
+                            uid: user.uid,
+                            email: user.email,
+                            name: user.displayName || user.email,
+                            role: "Colaborador",
+                            accessLevel: "Colaborador"
+                        };
+                    }
+                    initAuthenticatedUser();
+                } else {
+                    currentUser = null;
+                    document.getElementById('loginScreen').classList.remove('hidden');
+                }
+            });
 
-        // ================= RELÓGIO DIGITAL EM TEMPO REAL =================
+            loadVetsFromFirestore();
+            loadLogsFromFirestore();
+        });
+
         function startClock() {
             updateClock();
             setInterval(updateClock, 1000);
@@ -651,11 +697,12 @@
             const dateOptions = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
             const dateStr = now.toLocaleDateString('pt-BR', dateOptions);
 
-            document.getElementById('liveClock').textContent = timeStr;
-            document.getElementById('liveDate').textContent = dateStr;
+            const clockEl = document.getElementById('liveClock');
+            const dateEl = document.getElementById('liveDate');
+            if(clockEl) clockEl.textContent = timeStr;
+            if(dateEl) dateEl.textContent = dateStr;
         }
 
-        // ================= GEOLOCALIZAÇÃO =================
         function initGeolocation() {
             const statusBox = document.getElementById('geoStatusBox');
             const statusText = document.getElementById('geoStatusText');
@@ -666,52 +713,43 @@
                     (position) => {
                         const lat = position.coords.latitude.toFixed(6);
                         const lng = position.coords.longitude.toFixed(6);
-                        currentGeoLocation = {
-                            lat: lat,
-                            lng: lng,
-                            text: `${lat}, ${lng}`
-                        };
+                        currentGeoLocation = { lat: lat, lng: lng, text: `${lat}, ${lng}` };
 
-                        statusText.textContent = `Localização capturada: Lat ${lat}, Lng ${lng} (Precisão de GPS ok)`;
-                        statusBox.className = "bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between shadow-sm";
-                        geoIcon.className = "w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-lg font-bold";
-                        geoIcon.innerHTML = `<i class="fa-solid fa-location-dot"></i>`;
+                        if(statusText) statusText.textContent = `Localização capturada: Lat ${lat}, Lng ${lng} (Precisão ok)`;
+                        if(statusBox) statusBox.className = "bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between shadow-sm";
+                        if(geoIcon) {
+                            geoIcon.className = "w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-lg font-bold";
+                            geoIcon.innerHTML = `<i class="fa-solid fa-location-dot"></i>`;
+                        }
                     },
                     (error) => {
                         currentGeoLocation = { lat: null, lng: null, text: "GPS Indisponível/Negado" };
-                        statusText.textContent = "Aviso: Não foi possível obter o GPS exato. O ponto registrará sem coordenadas completas.";
-                        statusBox.className = "bg-rose-50 border border-rose-200 rounded-2xl p-4 flex items-center justify-between shadow-sm";
-                        geoIcon.className = "w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center text-lg font-bold";
-                        geoIcon.innerHTML = `<i class="fa-solid fa-location-crosshairs"></i>`;
+                        if(statusText) statusText.textContent = "Aviso: Não foi possível obter o GPS exato.";
+                        if(statusBox) statusBox.className = "bg-rose-50 border border-rose-200 rounded-2xl p-4 flex items-center justify-between shadow-sm";
+                        if(geoIcon) {
+                            geoIcon.className = "w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center text-lg font-bold";
+                            geoIcon.innerHTML = `<i class="fa-solid fa-location-crosshairs"></i>`;
+                        }
                     },
                     { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                 );
             } else {
                 currentGeoLocation = { lat: null, lng: null, text: "Navegador sem suporte a GPS" };
-                statusText.textContent = "Seu navegador não suporta geolocalização automática.";
             }
         }
 
-        // ================= SISTEMA DE AUTENTICAÇÃO =================
-        function handleLogin(e) {
+        async function handleLogin(e) {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+            const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
 
-            const vet = vetList.find(v => v.email.toLowerCase() === email && v.password === password);
-
-            if (vet) {
-                if (vet.status !== "Ativo") {
-                    showLoginError("Este perfil está inativo no sistema. Procure a coordenação.");
-                    return;
-                }
-                currentUser = vet;
-                isCoordUnlocked = (currentUser.accessLevel === "Coordenação");
-                localStorage.setItem('hovet_current_user', JSON.stringify(currentUser));
+            try {
+                await window.signInWithEmailAndPassword(window.firebaseAuth, email, password);
                 document.getElementById('loginError').classList.add('hidden');
                 document.getElementById('loginForm').reset();
-                initAuthenticatedUser();
-            } else {
+                showToast("Login realizado com sucesso!", "success");
+            } catch (error) {
+                console.error("Erro no login:", error);
                 showLoginError("E-mail ou senha incorretos!");
             }
         }
@@ -722,13 +760,17 @@
             errDiv.classList.remove('hidden');
         }
 
-        function handleLogout() {
-            currentUser = null;
-            isCoordUnlocked = false;
-            localStorage.removeItem('hovet_current_user');
-            switchTab('register');
-            document.getElementById('loginScreen').classList.remove('hidden');
-            showToast("Sessão encerrada com sucesso.", "info");
+        async function handleLogout() {
+            try {
+                await window.signOut(window.firebaseAuth);
+                currentUser = null;
+                isCoordUnlocked = false;
+                switchTab('register');
+                document.getElementById('loginScreen').classList.remove('hidden');
+                showToast("Sessão encerrada com sucesso.", "info");
+            } catch (error) {
+                console.error("Erro ao sair:", error);
+            }
         }
 
         function initAuthenticatedUser() {
@@ -744,16 +786,44 @@
             renderRecentLogs();
         }
 
-        // ================= SINCRONIZAÇÃO DE DROPDOWNS =================
+        function loadVetsFromFirestore() {
+            window.onSnapshot(window.collection(window.firebaseDb, 'vets'), (snapshot) => {
+                vetList = [];
+                snapshot.forEach((docSnap) => {
+                    vetList.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                syncVetDropdowns();
+                renderVetList();
+            }, (error) => {
+                console.error("Erro ao carregar veterinários:", error);
+            });
+        }
+
+        function loadLogsFromFirestore() {
+            const q = window.query(window.collection(window.firebaseDb, 'ponto_logs'), window.orderBy('timestamp', 'desc'));
+            window.onSnapshot(q, (snapshot) => {
+                logs = [];
+                snapshot.forEach((docSnap) => {
+                    logs.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                renderRecentLogs();
+                if (!document.getElementById('tabCoordination').classList.contains('hidden')) {
+                    updateCoordinationDashboard();
+                }
+            }, (error) => {
+                console.error("Erro ao carregar logs:", error);
+            });
+        }
+
         function syncVetDropdowns() {
             const coordSelect = document.getElementById('coordFilterVet');
+            if (!coordSelect) return;
             
             coordSelect.innerHTML = '<option value="ALL">Todos os Profissionais</option>' +
                 vetList.map(v => `<option value="${v.name}">${v.name} (${v.role})</option>`).join('');
         }
 
-        // ================= SEÇÃO: REGISTRO DE PONTO E MODAL =================
-        function openJustificationModal(type, colorTheme) {
+        function openJustificationModal(type) {
             if (!currentUser) {
                 document.getElementById('loginScreen').classList.remove('hidden');
                 return;
@@ -774,7 +844,7 @@
             document.getElementById('justificationModal').classList.add('hidden');
         }
 
-        function confirmPunchRegistration(e) {
+        async function confirmPunchRegistration(e) {
             e.preventDefault();
             const now = new Date();
 
@@ -782,7 +852,6 @@
             const notes = document.getElementById('modalReasonNotes').value.trim();
 
             const newLog = {
-                id: Date.now(),
                 vetName: currentUser.name,
                 vetRole: currentUser.role,
                 timestamp: now.toISOString(),
@@ -796,23 +865,24 @@
                 lng: currentGeoLocation.lng
             };
 
-            logs.unshift(newLog); // Adiciona no início
-            localStorage.setItem('hovet_ponto_logs', JSON.stringify(logs));
-
-            closeJustificationModal();
-            showToast(`Ponto de ${activePunchType} registrado com sucesso!`);
-            renderRecentLogs();
+            try {
+                await window.addDoc(window.collection(window.firebaseDb, 'ponto_logs'), newLog);
+                closeJustificationModal();
+                showToast(`Ponto de ${activePunchType} registrado com sucesso na nuvem!`);
+            } catch (error) {
+                console.error("Erro ao registrar ponto:", error);
+                showToast("Erro ao registrar ponto no Firestore.", "warning");
+            }
         }
 
         function renderRecentLogs() {
             const tbody = document.getElementById('recentLogsTable');
-            if (!currentUser) return;
+            if (!currentUser || !tbody) return;
 
-            // Filtra logs pertencentes apenas ao usuário logado
             const myLogs = logs.filter(l => l.vetName === currentUser.name).slice(0, 5);
 
             if (myLogs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-6 text-center text-slate-400">Nenhum registro efetuado hoje.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-6 text-center text-slate-400">Nenhum registro efetuado.</td></tr>`;
                 return;
             }
 
@@ -851,20 +921,20 @@
             }).join('');
         }
 
-        // ================= SEÇÃO: PAINEL DA COORDENAÇÃO =================
         function updateCoordinationDashboard() {
-            const selectedMonth = document.getElementById('coordFilterMonth').value; // Formato "YYYY-MM"
+            const selectedMonth = document.getElementById('coordFilterMonth').value;
             const selectedVet = document.getElementById('coordFilterVet').value;
 
             const filteredLogs = logs.filter(log => {
-                const logMonth = log.timestamp.slice(0, 7);
+                const logMonth = log.timestamp ? log.timestamp.slice(0, 7) : "";
                 const matchMonth = selectedMonth ? logMonth === selectedMonth : true;
                 const matchVet = selectedVet !== "ALL" ? log.vetName === selectedVet : true;
                 return matchMonth && matchVet;
             });
 
-            // Renderiza tabela filtrada
             const tbody = document.getElementById('coordLogsTable');
+            if (!tbody) return;
+
             if (filteredLogs.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-6 text-center text-slate-400">Nenhum ponto registrado para os filtros selecionados.</td></tr>`;
             } else {
@@ -882,7 +952,6 @@
                 `).join('');
             }
 
-            // Cálculos Resumidos de Horas
             let totalMinutesRegular = 0;
             let totalMinutesPlantao = 0;
             let totalOcorrencias = 0;
@@ -891,10 +960,8 @@
                 if (log.reasonCategory && log.reasonCategory !== "Sem alteração (No horário)") {
                     totalOcorrencias++;
                 }
-
-                // Cálculo simples de carga por tipo de batida
-                if (log.type === "Entrada Plantão") totalMinutesPlantao += 12 * 60; // Estima plantão 12h
-                if (log.type === "Entrada") totalMinutesRegular += 4 * 60; // Estima bloco regular de 4h
+                if (log.type === "Entrada Plantão") totalMinutesPlantao += 12 * 60;
+                if (log.type === "Entrada") totalMinutesRegular += 4 * 60;
             });
 
             document.getElementById('cardTotalRegular').textContent = formatMinutesToHHMM(totalMinutesRegular);
@@ -914,7 +981,7 @@
             const selectedVet = document.getElementById('coordFilterVet').value;
 
             const filtered = logs.filter(log => {
-                const logMonth = log.timestamp.slice(0, 7);
+                const logMonth = log.timestamp ? log.timestamp.slice(0, 7) : "";
                 const matchMonth = selectedMonth ? logMonth === selectedMonth : true;
                 const matchVet = selectedVet !== "ALL" ? log.vetName === selectedVet : true;
                 return matchMonth && matchVet;
@@ -951,26 +1018,26 @@
             document.body.removeChild(link);
         }
 
-        // ================= SEÇÃO: CADASTRO DE VETERINÁRIOS =================
         function renderVetList() {
             const tbody = document.getElementById('vetListTable');
+            if (!tbody) return;
+
             tbody.innerHTML = vetList.map(vet => `
                 <tr class="hover:bg-slate-50 transition">
                     <td class="px-6 py-4 font-bold text-slate-800">${vet.name}</td>
                     <td class="px-6 py-4 text-xs font-semibold text-ufmt-900">${vet.role}</td>
                     <td class="px-6 py-4 text-xs font-bold ${vet.accessLevel === 'Coordenação' ? 'text-purple-700 bg-purple-50 px-2 py-1 rounded-md' : 'text-slate-600'}">${vet.accessLevel || 'Colaborador'}</td>
                     <td class="px-6 py-4 text-xs font-mono text-slate-600">${vet.email || '<span class="text-slate-400">Não informado</span>'}</td>
-                    <td class="px-6 py-4 text-xs font-mono text-slate-400">••••••••</td>
                     <td class="px-6 py-4">
                         <span class="px-2.5 py-1 rounded-full text-xs font-bold ${vet.status === 'Ativo' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'}">
                             ${vet.status}
                         </span>
                     </td>
                     <td class="px-6 py-4 text-right space-x-2">
-                        <button onclick="editVet(${vet.id})" class="text-ufmt-700 hover:text-ufmt-900 p-1.5 rounded-lg hover:bg-slate-100 transition" title="Editar">
+                        <button onclick="editVet('${vet.id}')" class="text-ufmt-700 hover:text-ufmt-900 p-1.5 rounded-lg hover:bg-slate-100 transition" title="Editar">
                             <i class="fa-solid fa-pen"></i>
                         </button>
-                        <button onclick="deleteVet(${vet.id})" class="text-rose-600 hover:text-rose-800 p-1.5 rounded-lg hover:bg-rose-50 transition" title="Remover">
+                        <button onclick="deleteVet('${vet.id}')" class="text-rose-600 hover:text-rose-800 p-1.5 rounded-lg hover:bg-rose-50 transition" title="Remover">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </td>
@@ -978,9 +1045,9 @@
             `).join('');
         }
 
-        function saveVetForm(e) {
+        async function saveVetForm(e) {
             e.preventDefault();
-            const id = document.getElementById('vetFormId').value;
+            const docId = document.getElementById('vetFormDocId').value;
             const name = document.getElementById('vetFormName').value.trim();
             const role = document.getElementById('vetFormRole').value;
             const accessLevel = document.getElementById('vetFormAccessLevel').value;
@@ -988,44 +1055,37 @@
             const password = document.getElementById('vetFormPassword').value;
             const status = document.getElementById('vetFormStatus').value;
 
-            if (id) {
-                // Editar existente
-                const index = vetList.findIndex(v => v.id == id);
-                if (index !== -1) {
-                    vetList[index] = { id: Number(id), name, role, accessLevel, email, password, status };
+            try {
+                if (docId) {
+                    const docRef = window.doc(window.firebaseDb, 'vets', docId);
+                    await window.updateDoc(docRef, { name, role, accessLevel, email, status });
                     showToast("Cadastro atualizado com sucesso!", "success");
+                } else {
+                    await window.addDoc(window.collection(window.firebaseDb, 'vets'), { name, role, accessLevel, email, status });
+                    try {
+                        await window.createUserWithEmailAndPassword(window.firebaseAuth, email, password);
+                    } catch (authErr) {
+                        console.log("Aviso de Auth:", authErr);
+                    }
+                    showToast("Médico cadastrado com sucesso no Firebase!", "success");
                 }
-            } else {
-                // Novo cadastro
-                const newVet = {
-                    id: Date.now(),
-                    name,
-                    role,
-                    accessLevel,
-                    email,
-                    password,
-                    status
-                };
-                vetList.push(newVet);
-                showToast("Médico veterinário cadastrado com sucesso!", "success");
+                resetVetForm();
+            } catch (error) {
+                console.error("Erro ao salvar veterinário:", error);
+                showToast("Erro ao salvar dados no Firebase.", "warning");
             }
-
-            localStorage.setItem('hovet_medicos_v1', JSON.stringify(vetList));
-            resetVetForm();
-            syncVetDropdowns();
-            renderVetList();
         }
 
         function editVet(id) {
             const vet = vetList.find(v => v.id === id);
             if (!vet) return;
 
-            document.getElementById('vetFormId').value = vet.id;
+            document.getElementById('vetFormDocId').value = vet.id;
             document.getElementById('vetFormName').value = vet.name;
             document.getElementById('vetFormRole').value = vet.role;
             document.getElementById('vetFormAccessLevel').value = vet.accessLevel || "Colaborador";
             document.getElementById('vetFormEmail').value = vet.email || "";
-            document.getElementById('vetFormPassword').value = vet.password || "";
+            document.getElementById('vetFormPassword').value = "********";
             document.getElementById('vetFormStatus').value = vet.status;
 
             document.getElementById('vetFormTitle').textContent = "Editar Cadastro de Veterinário";
@@ -1037,13 +1097,15 @@
             document.getElementById('confirmDeleteModal').classList.remove('hidden');
         }
 
-        function confirmDeleteVet() {
+        async function confirmDeleteVet() {
             if (vetIdToDelete !== null) {
-                vetList = vetList.filter(v => v.id !== vetIdToDelete);
-                localStorage.setItem('hovet_medicos_v1', JSON.stringify(vetList));
-                syncVetDropdowns();
-                renderVetList();
-                showToast("Cadastro removido com sucesso.");
+                try {
+                    await window.deleteDoc(window.doc(window.firebaseDb, 'vets', vetIdToDelete));
+                    showToast("Cadastro removido do Firestore com sucesso.");
+                } catch (error) {
+                    console.error("Erro ao excluir:", error);
+                    showToast("Erro ao remover cadastro.", "warning");
+                }
             }
             closeDeleteModal();
         }
@@ -1055,7 +1117,7 @@
 
         function resetVetForm() {
             document.getElementById('vetForm').reset();
-            document.getElementById('vetFormId').value = "";
+            document.getElementById('vetFormDocId').value = "";
             document.getElementById('vetFormTitle').textContent = "Cadastrar Novo Médico / Colaborador";
             document.getElementById('vetCancelBtn').classList.add('hidden');
         }
@@ -1081,7 +1143,6 @@
             }
         }
 
-        // Alternar Abas Principais com Restrição de Acesso
         function switchTab(tab) {
             const tabReg = document.getElementById('tabRegister');
             const tabCoord = document.getElementById('tabCoordination');
@@ -1090,7 +1151,6 @@
             const btnCoord = document.getElementById('tabBtnCoordination');
 
             if (tab === 'coordination') {
-                // Se o usuário logado NÃO é da coordenação e a aba não foi liberada por PIN
                 if (currentUser && currentUser.accessLevel !== 'Coordenação' && !isCoordUnlocked) {
                     document.getElementById('coordAuthModal').classList.remove('hidden');
                     return;
@@ -1106,12 +1166,10 @@
             if (tab === 'register') {
                 tabReg.classList.remove('hidden');
                 btnReg.className = "px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 bg-white text-ufmt-900 shadow";
-                syncVetDropdowns();
                 renderRecentLogs();
             } else if (tab === 'coordination') {
                 tabCoord.classList.remove('hidden');
                 btnCoord.className = "px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 bg-white text-ufmt-900 shadow";
-                syncVetDropdowns();
                 updateCoordinationDashboard();
                 renderVetList();
             }
@@ -1119,32 +1177,14 @@
 
         function handleCoordAuthSubmit(e) {
             e.preventDefault();
-            const pin = document.getElementById('coordAuthPin').value;
-            // Valida PIN ou Senha de qualquer usuário de Nível Coordenação
-            const coordAccount = vetList.find(v => v.accessLevel === 'Coordenação' && v.password === pin);
             
-            if (pin === "admin" || coordAccount) {
+            if (currentUser && currentUser.accessLevel === 'Coordenação') {
                 isCoordUnlocked = true;
                 document.getElementById('coordAuthModal').classList.add('hidden');
                 document.getElementById('coordAuthPin').value = "";
                 document.getElementById('coordAuthError').classList.add('hidden');
                 
-                // Abre a aba da coordenação sem re-desencadear a checagem de modal
-                const tabReg = document.getElementById('tabRegister');
-                const tabCoord = document.getElementById('tabCoordination');
-                const btnReg = document.getElementById('tabBtnRegister');
-                const btnCoord = document.getElementById('tabBtnCoordination');
-
-                btnReg.className = "px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 text-white/80 hover:bg-white/10 hover:text-white";
-                btnCoord.className = "px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 bg-white text-ufmt-900 shadow";
-
-                tabReg.classList.add('hidden');
-                tabCoord.classList.remove('hidden');
-
-                syncVetDropdowns();
-                updateCoordinationDashboard();
-                renderVetList();
-
+                switchTab('coordination');
                 showToast("Acesso à Coordenação liberado!", "success");
             } else {
                 document.getElementById('coordAuthError').classList.remove('hidden');
@@ -1157,8 +1197,7 @@
             document.getElementById('coordAuthError').classList.add('hidden');
         }
 
-        // Toast de Notificação
-        function showToast(msg, type = "success") {
+        function showToast(msg) {
             const toast = document.getElementById('toastNotification');
             const toastMessage = document.getElementById('toastMessage');
             
