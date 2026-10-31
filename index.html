@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ponto Eletrônico - HOVET UFMT Sinop</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        ufmt: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- TELA DE LOGIN / AUTENTICAÇÃO INICIAL -->
+    <div id="loginScreen" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-100">
+            <div class="bg-gradient-to-r from-ufmt-900 to-ufmt-800 p-8 text-white text-center">
+                <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-3 backdrop-blur-sm border border-white/20">
+                    <i class="fa-solid fa-user-doctor"></i>
+                </div>
+                <h1 class="text-xl font-bold tracking-tight">Hospital Veterinário - HOVET</h1>
+                <p class="text-xs text-slate-200 mt-1 font-light">Universidade Federal de Mato Grosso, campus Sinop</p>
+            </div>
+            
+            <div class="p-8">
+                <h2 class="text-sm font-bold uppercase text-slate-400 tracking-wider mb-6 text-center">Acesso ao Sistema de Ponto</h2>
+                
+                <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-500 mb-1">E-mail Institucional</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                                <i class="fa-solid fa-envelope"></i>
+                            </span>
+                            <input type="email" id="loginEmail" required placeholder="seu.email@ufmt.br" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-ufmt-600 focus:outline-none transition">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Senha de Acesso</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                                <i class="fa-solid fa-lock"></i>
+                            </span>
+                            <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-ufmt-600 focus:outline-none transition">
+                        </div>
+                    </div>
+
+                    <div id="loginError" class="hidden p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 font-semibold flex items-center gap-2">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        <span id="loginErrorMessage">E-mail ou senha incorretos!</span>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-ufmt-800 to-ufmt-900 hover:from-ufmt-900 hover:to-slate-900 text-white font-bold rounded-xl shadow-lg transition duration-200 flex items-center justify-center gap-2 text-sm">
+                        <i class="fa-solid fa-right-to-bracket"></i>
+                        Entrar no Sistema
+                    </button>
+                </form>
+
+                <div class="mt-6 pt-4 border-t border-slate-100 text-center text-xs text-slate-400">
+                    Dúvidas ou problemas de acesso? Procure a Coordenação do HOVET.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CABEÇALHO DA APLICAÇÃO -->
+    <header class="bg-gradient-to-r from-ufmt-900 via-ufmt-800 to-slate-900 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            
+            <!-- Título e Subtítulo -->
+            <div class="flex items-center gap-4">
+                <div class="p-3 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/20 hidden sm:block">
+                    <i class="fa-solid fa-hospital-user text-2xl text-emerald-300"></i>
+                </div>
+                <div class="text-center md:text-left">
+                    <h1 class="text-xl sm:text-2xl font-bold tracking-tight">Hospital Veterinário - HOVET</h1>
+                    <p class="text-xs sm:text-sm text-slate-300 font-light tracking-wide">Universidade Federal de Mato Grosso, campus Sinop</p>
+                </div>
+            </div>
+
+            <!-- Navegação por Abas -->
+            <nav class="flex bg-slate-800/60 p-1.5 rounded-xl border border-white/10 backdrop-blur-md">
+                <button id="tabBtnRegister" onclick="switchTab('register')" class="px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 bg-white text-ufmt-900 shadow">
+                    <i class="fa-solid fa-fingerprint"></i>
+                    Registrar Ponto
+                </button>
+                <button id="tabBtnCoordination" onclick="switchTab('coordination')" class="px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 text-white/80 hover:bg-white/10 hover:text-white">
+                    <i class="fa-solid fa-user-shield"></i>
+                    Painel Coordenação
+                </button>
+            </nav>
+
+            <!-- Relógio e Status GPS -->
+            <div class="flex items-center gap-4">
+                <div class="bg-slate-800/80 px-4 py-2 rounded-xl border border-white/10 text-right backdrop-blur-sm">
+                    <div id="liveClock" class="text-lg font-mono font-bold leading-none text-emerald-400">00:00:00</div>
+                    <div id="liveDate" class="text-[10px] uppercase tracking-wider text-slate-300 font-medium mt-1">Carregando data...</div>
+                </div>
+
+                <!-- Perfil Autenticado -->
+                <div class="flex items-center gap-3 pl-2 border-l border-white/10">
+                    <div class="text-right hidden sm:block">
+                        <div id="currentUserDisplayName" class="text-xs font-bold text-white">Carregando...</div>
+                        <div id="currentUserDisplayRole" class="text-[10px] text-slate-300">Colaborador</div>
+                    </div>
+                    <button onclick="handleLogout()" class="p-2.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 rounded-xl transition border border-rose-500/30" title="Sair do Sistema">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL (ABAS) -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6 sm:px-6 lg:px-8 space-y-6">
+
+        <!-- STATUS DE GEOLOCALIZAÇÃO ALERTA -->
+        <div id="geoStatusBox" class="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
+            <div class="flex items-center gap-3">
+                <div id="geoIcon" class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-lg font-bold">
+                    <i class="fa-solid fa-location-dot animate-pulse"></i>
+                </div>
+                <div>
+                    <h3 class="text-xs uppercase font-bold text-amber-800 tracking-wider">Localização para Registro</h3>
+                    <p id="geoStatusText" class="text-sm font-medium text-amber-900">Obtendo coordenadas via GPS...</p>
+                </div>
+            </div>
+            <button onclick="initGeolocation()" class="px-3 py-1.5 bg-amber-200/60 hover:bg-amber-200 text-amber-900 text-xs font-semibold rounded-lg transition flex items-center gap-1.5">
+                <i class="fa-solid fa-rotate-right"></i> Recarregar GPS
+            </button>
+        </div>
+
+        <!-- ABA 1: REGISTRO DE PONTO (USUÁRIO) -->
+        <div id="tabRegister" class="space-y-6">
+            
+            <!-- SELEÇÃO DE COLABORADOR E BOTOES DE PONTO -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-6">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-ufmt-800"></i>
+                        Registrar Frequência Individual
+                    </h2>
+                    <p class="text-xs text-slate-500">Selecione o tipo de ponto abaixo. A hora exata e a localização serão anexadas ao seu registro.</p>
+                </div>
+
+                <!-- 6 OPÇÕES DE REGISTRO DE PONTO -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- 1. ENTRADA -->
+                    <button onclick="openJustificationModal('Entrada', 'green')" class="group relative overflow-hidden bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white p-5 rounded-2xl shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all duration-200 text-left flex flex-col justify-between h-32">
+                        <div class="flex justify-between items-start">
+                            <span class="p-2 bg-white/20 rounded-xl backdrop-blur-sm"><i class="fa-solid fa-right-to-bracket text-xl"></i></span>
+                            <span class="text-xs bg-emerald-700/60 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">Início</span>
+                        </div>
+                        <div>
+                            <span class="block text-lg font-extrabold">Entrada</span>
+                            <span class="text-xs text-emerald-100">Início da jornada regular</span>
+                        </div>
+                    </button>
+
+                    <!-- 2. SAÍDA ALMOÇO -->
+                    <button onclick="openJustificationModal('Saída Almoço', 'amber')" class="group relative overflow-hidden bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white p-5 rounded-2xl shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 transition-all duration-200 text-left flex flex-col justify-between h-32">
+                        <div class="flex justify-between items-start">
+                            <span class="p-2 bg-white/20 rounded-xl backdrop-blur-sm"><i class="fa-solid fa-utensils text-xl"></i></span>
+                            <span class="text-xs bg-amber-700/60 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">Intervalo</span>
+                        </div>
+                        <div>
+                            <span class="block text-lg font-extrabold">Saída Almoço</span>
+                            <span class="text-xs text-amber-100">Pausa para refeição/descanso</span>
+                        </div>
+                    </button>
+
+                    <!-- 3. RETORNO ALMOÇO -->
+                    <button onclick="openJustificationModal('Retorno Almoço', 'blue')" class="group relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white p-5 rounded-2xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all duration-200 text-left flex flex-col justify-between h-32">
+                        <div class="flex justify-between items-start">
+                            <span class="p-2 bg-white/20 rounded-xl backdrop-blur-sm"><i class="fa-solid fa-rotate-left text-xl"></i></span>
+                            <span class="text-xs bg-blue-700/60 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">Retorno</span>
+                        </div>
+                        <div>
+                            <span class="block text-lg font-extrabold">Retorno Almoço</span>
+                            <span class="text-xs text-blue-100">Volta do intervalo de refeição</span>
+                        </div>
+                    </button>
+
+                    <!-- 4. SAÍDA -->
+                    <button onclick="openJustificationModal('Saída', 'rose')" class="group relative overflow-hidden bg-gradient-to-br from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white p-5 rounded-2xl shadow-lg shadow-rose-500/20 hover:shadow-rose-500/30 transition-all duration-200 text-left flex flex-col justify-between h-32">
+                        <div class="flex justify-between items-start">
+                            <span class="p-2 bg-white/20 rounded-xl backdrop-blur-sm"><i class="fa-solid fa-right-from-bracket text-xl"></i></span>
+                            <span class="text-xs bg-rose-700/60 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">Fim</span>
+                        </div>
+                        <div>
+                            <span class="block text-lg font-extrabold">Saída</span>
+                            <span class="text-xs text-rose-100">Encerramento do expediente</span>
+                        </div>
+                    </button>
+
+                    <!-- 5. ENTRADA PLANTÃO -->
+                    <button onclick="openJustificationModal('Entrada Plantão', 'purple')" class="group relative overflow-hidden bg-gradient-to-br from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white p-5 rounded-2xl shadow-lg shadow-purple-600/20 hover:shadow-purple-600/30 transition-all duration-200 text-left flex flex-col justify-between h-32">
+                        <div class="flex justify-between items-start">
+                            <span class="p-2 bg-white/20 rounded-xl backdrop-blur-sm"><i class="fa-solid fa-user-clock text-xl"></i></span>
+                            <span class="text-xs bg-purple-800/60 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">Plantão</span>
+                        </div>
+                        <div>
+                            <span class="block text-lg font-extrabold">Entrada Plantão</span>
+                            <span class="text-xs text-purple-100">Início do turno de plantão</span>
+                        </div>
+                    </button>
+
+                    <!-- 6. SAÍDA PLANTÃO -->
+                    <button onclick="openJustificationModal('Saída Plantão', 'indigo')" class="group relative overflow-hidden bg-gradient-to-br from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white p-5 rounded-2xl shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/30 transition-all duration-200 text-left flex flex-col justify-between h-32">
+                        <div class="flex justify-between items-start">
+                            <span class="p-2 bg-white/20 rounded-xl backdrop-blur-sm"><i class="fa-solid fa-house-medical text-xl"></i></span>
+                            <span class="text-xs bg-indigo-800/60 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">Plantão</span>
+                        </div>
+                        <div>
+                            <span class="block text-lg font-extrabold">Saída Plantão</span>
+                            <span class="text-xs text-indigo-100">Encerramento do turno de plantão</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- REGISTROS DO DIA (HISTÓRICO LOCAL DO USUÁRIO LOGADO) -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-ufmt-800"></i>
+                        Meus Registros Recentes
+                    </h3>
+                    <span class="text-xs text-slate-400 font-mono">HOVET - UFMT Sinop</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-600">
+                        <thead class="bg-slate-50 text-slate-500 uppercase text-xs font-semibold">
+                            <tr>
+                                <th class="px-4 py-3 rounded-l-xl">Data / Hora</th>
+                                <th class="px-4 py-3">Tipo de Ponto</th>
+                                <th class="px-4 py-3">Justificativa / Ocorrência</th>
+                                <th class="px-4 py-3 rounded-r-xl">Localização GPS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentLogsTable" class="divide-y divide-slate-100">
+                            <!-- Inserido dinamicamente via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA 2: PAINEL DA COORDENAÇÃO -->
+        <div id="tabCoordination" class="space-y-6 hidden">
+            
+            <!-- NAVEGAÇÃO INTERNA DA COORDENAÇÃO -->
+            <div class="flex border-b border-slate-200 gap-4">
+                <button id="coordSubTabBtnReports" onclick="switchCoordSubTab('reports')" class="pb-3 border-b-2 border-ufmt-800 font-bold text-ufmt-800 text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie"></i> Relatórios Mensais & Horas
+                </button>
+                <button id="coordSubTabBtnVets" onclick="switchCoordSubTab('vets')" class="pb-3 border-b-2 border-transparent font-medium text-slate-500 hover:text-slate-800 text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-user-doctor"></i> Cadastro de Médicos Veterinários
+                </button>
+            </div>
+
+            <!-- SUB-ABA 1: RELATÓRIOS MENSAIS E HORAS -->
+            <div id="coordSubTabReports" class="space-y-6">
+                <!-- PAINEL DE FILTROS DA COORDENAÇÃO -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
+                    <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-filter text-ufmt-800"></i>
+                        Filtros do Relatório Mensal
+                    </h3>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Mês / Ano Referência</label>
+                            <input type="month" id="coordFilterMonth" onchange="updateCoordinationDashboard()" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-ufmt-600 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Médico / Colaborador</label>
+                            <select id="coordFilterVet" onchange="updateCoordinationDashboard()" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-ufmt-600 focus:outline-none">
+                                <option value="ALL">Todos os Profissionais</option>
+                                <!-- Inserido via JS -->
+                            </select>
+                        </div>
+                        <div class="flex items-end gap-2">
+                            <button onclick="exportToCSV()" class="w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-sm transition shadow flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-file-excel"></i> Exportar CSV
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARDS DE RESUMO DE CARGA HORÁRIA -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-business-time"></i>
+                        </div>
+                        <div>
+                            <span class="block text-xs font-bold uppercase text-slate-400">Total Horas Regulares</span>
+                            <span id="cardTotalRegular" class="text-xl font-extrabold text-slate-800">0h 00m</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-user-clock"></i>
+                        </div>
+                        <div>
+                            <span class="block text-xs font-bold uppercase text-slate-400">Total Horas Plantão</span>
+                            <span id="cardTotalPlantao" class="text-xl font-extrabold text-slate-800">0h 00m</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <div>
+                            <span class="block text-xs font-bold uppercase text-slate-400">Justificativas</span>
+                            <span id="cardTotalOcorrencias" class="text-xl font-extrabold text-slate-800">0 ocorrências</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-[#075985] text-emerald-700 fa-clock"></i>
+                        </div>
+                        <div>
+                            <span class="block text-xs font-bold uppercase text-slate-400">Carga Horária Geral</span>
+                            <span id="cardTotalGeral" class="text-xl font-extrabold text-emerald-700">0h 00m</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TABELA COMPLETA DA COORDENAÇÃO -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
+                    <h3 class="text-base font-bold text-slate-800">Registros do Mês Selecionado</h3>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-slate-600">
+                            <thead class="bg-slate-50 text-slate-500 uppercase text-xs font-semibold">
+                                <tr>
+                                    <th class="px-4 py-3">Profissional</th>
+                                    <th class="px-4 py-3">Data / Hora</th>
+                                    <th class="px-4 py-3">Ponto</th>
+                                    <th class="px-4 py-3">Motivo / Justificativa</th>
+                                    <th class="px-4 py-3">Obs.</th>
+                                    <th class="px-4 py-3">GPS / Local</th>
+                                </tr>
+                            </thead>
+                            <tbody id="coordLogsTable" class="divide-y divide-slate-100">
+                                <!-- Inserido dinamicamente via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUB-ABA 2: CADASTRO DE MÉDICOS VETERINÁRIOS -->
+            <div id="coordSubTabVets" class="space-y-6 hidden">
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-6">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 id="vetFormTitle" class="text-base font-bold text-slate-800">Cadastrar Novo Médico / Colaborador</h3>
+                            <p class="text-xs text-slate-500">Insira as informações do profissional para liberar o acesso ao sistema de ponto.</p>
+                        </div>
+                        <button id="vetCancelBtn" onclick="resetVetForm()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold rounded-lg hidden">
+                            Cancelar Edição
+                        </button>
+                    </div>
+
+                    <form id="vetForm" onsubmit="saveVetForm(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <input type="hidden" id="vetFormId">
+                        
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Nome Completo *</label>
+                            <input type="text" id="vetFormName" required placeholder="Ex: Dr. Roberto Alves" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-ufmt-600 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Cargo / Especialidade *</label>
+                            <select id="vetFormRole" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-ufmt-600 focus:outline-none">
+                                <option value="Coordenador Veterinário">Coordenador Veterinário (Admin)</option>
+                                <option value="Médico Veterinário">Médico Veterinário</option>
+                                <option value="Cirurgião Veterinário">Cirurgião Veterinário</option>
+                                <option value="Plantonista Veterinário">Plantonista Veterinário</option>
+                                <option value="Anestesista Veterinário">Anestesista Veterinário</option>
+                                <option value="Residente Veterinário">Residente Veterinário</option>
+                                <option value="Enfermeiro Veterinário">Enfermeiro Veterinário</option>
+                                <option value="Auxiliar Veterinário">Auxiliar Veterinário</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Perfil de Acesso *</label>
+                            <select id="vetFormAccessLevel" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-ufmt-600 focus:outline-none font-bold text-ufmt-800">
+                                <option value="Colaborador">Colaborador (Somente Registro de Ponto)</option>
+                                <option value="Coordenação">Coordenação (Acesso Administrativo)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-400 mb-1">E-mail Inst.</label>
+                            <input type="email" id="vetFormEmail" placeholder="usuario@ufmt.br" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-ufmt-600 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Senha de Acesso *</label>
+                            <input type="password" id="vetFormPassword" required placeholder="Digite a senha..." class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-ufmt-600 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Status</label>
+                            <select id="vetFormStatus" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-ufmt-600 focus:outline-none">
+                                <option value="Ativo">Ativo</option>
+                                <option value="Inativo">Inativo</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end sm:col-span-2 lg:col-span-3 justify-end">
+                            <button type="submit" class="w-full sm:w-auto px-6 py-2 bg-ufmt-800 hover:bg-ufmt-900 text-white font-semibold rounded-xl text-sm transition shadow flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-save"></i>
+                                Salvar Cadastro
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- QUADRO DE MÉDICOS CADASTRAIS -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
+                    <h3 class="text-base font-bold text-slate-800">Quadro de Profissionais do HOVET</h3>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-slate-600">
+                            <thead class="bg-slate-50 text-slate-500 uppercase text-xs font-semibold">
+                                <tr>
+                                    <th class="px-6 py-3">Nome Completo</th>
+                                    <th class="px-6 py-3">Cargo / Função</th>
+                                    <th class="px-6 py-3">Nível de Acesso</th>
+                                    <th class="px-6 py-3">E-mail Institucional</th>
+                                    <th class="px-6 py-3">Senha</th>
+                                    <th class="px-6 py-3">Status</th>
+                                    <th class="px-6 py-3 text-right">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vetListTable" class="divide-y divide-slate-100">
+                                <!-- Populado via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- RODAPÉ DA PÁGINA -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 mt-auto">
+        <p>Hospital Veterinário - HOVET | <strong>Universidade Federal de Mato Grosso (UFMT)</strong> - Campus Sinop</p>
+        <p class="mt-0.5 text-slate-400">Desenvolvido para controle de ponto e plantões cirúrgicos/clínicos.</p>
+    </footer>
+
+    <!-- MODAL DE JUSTIFICATIVA / OCORRÊNCIAS -->
+    <div id="justificationModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 space-y-5 border border-slate-100">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-3">
+                    <div id="modalBadgeIcon" class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                    <div>
+                        <h3 id="modalTitleType" class="text-lg font-bold text-slate-800">Registrar Entrada</h3>
+                        <p class="text-xs text-slate-400">Confirme os dados e adicione justificativa se houver</p>
+                    </div>
+                </div>
+                <button onclick="closeJustificationModal()" class="text-slate-400 hover:text-slate-600 p-2 rounded-lg">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form onsubmit="confirmPunchRegistration(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Motivo / Categoria da Justificativa</label>
+                    <select id="modalReasonCategory" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-ufmt-600 focus:outline-none">
+                        <option value="Sem alteração (No horário)">Nenhuma (No horário regular)</option>
+                        <option value="Emergência Veterinária / Cirurgia">Emergência Veterinária / Cirurgia de Urgência</option>
+                        <option value="Trânsito / Deslocamento">Trânsito / Problemas no Deslocamento</option>
+                        <option value="Atendimento de Campo / Ambulatório">Atendimento de Campo / Externo</option>
+                        <option value="Troca de Turno / Plantão">Troca de Turno / Plantão</option>
+                        <option value="Outro Motivo / Atraso">Outro Motivo / Atraso Justificado</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Observações / Detalhes (Opcional)</label>
+                    <textarea id="modalReasonNotes" rows="3" placeholder="Descreva os detalhes caso haja atrasos, cirurgias de emergência ou trocas..." class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-ufmt-600 focus:outline-none resize-none"></textarea>
+                </div>
+
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs text-slate-500 space-y-1">
+                    <div class="flex justify-between">
+                        <span>Horário Atual:</span>
+                        <strong id="modalCurrentTime" class="text-slate-800 font-mono">--:--:--</strong>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Localização GPS:</span>
+                        <strong id="modalGeoLocation" class="text-slate-800 font-mono text-[11px] truncate max-w-[200px]">Capturando...</strong>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <button type="button" onclick="closeJustificationModal()" class="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="w-1/2 py-2.5 bg-ufmt-800 hover:bg-ufmt-900 text-white text-sm font-semibold rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check"></i> Confirmar Ponto
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE AUTENTICAÇÃO DA COORDENAÇÃO (SENHA PIN) -->
+    <div id="coordAuthModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 space-y-4 border border-slate-100 text-center">
+            <div class="w-12 h-12 bg-amber-100 text-amber-700 rounded-2xl flex items-center justify-center text-xl font-bold mx-auto">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-slate-900">Acesso Restrito à Coordenação</h3>
+                <p class="text-xs text-slate-500 mt-1">Digite a senha/PIN de segurança da coordenação para prosseguir.</p>
+            </div>
+            <form onsubmit="handleCoordAuthSubmit(event)" class="space-y-3">
+                <input type="password" id="coordAuthPin" placeholder="Senha de segurança..." required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-center text-slate-800 font-mono text-sm focus:ring-2 focus:ring-ufmt-600 focus:outline-none">
+                <div id="coordAuthError" class="hidden text-xs text-rose-600 font-semibold">Senha incorreta! Tente novamente.</div>
+                <div class="flex gap-2">
+                    <button type="button" onclick="closeCoordAuthModal()" class="flex-1 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="flex-1 px-4 py-2 bg-ufmt-800 hover:bg-ufmt-900 text-white text-sm font-semibold rounded-xl shadow transition">
+                        Acessar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMAÇÃO DE EXCLUSÃO (SEM ALERT/CONFIRM NATIVO) -->
+    <div id="confirmDeleteModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 space-y-4 border border-slate-100 text-center">
+            <div class="w-12 h-12 bg-rose-100 text-rose-700 rounded-2xl flex items-center justify-center text-xl font-bold mx-auto">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-slate-900">Remover Profissional</h3>
+                <p class="text-xs text-slate-500 mt-1">Tem certeza que deseja remover o cadastro deste médico veterinário?</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="closeDeleteModal()" class="flex-1 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition">
+                    Cancelar
+                </button>
+                <button onclick="confirmDeleteVet()" class="flex-1 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold rounded-xl shadow transition">
+                    Remover
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST DE NOTIFICAÇÃO DA INTERFACE -->
+    <div id="toastNotification" class="fixed bottom-4 right-4 z-50 transform translate-y-20 opacity-0 transition-all duration-300">
+        <div id="toastContent" class="px-4 py-3 rounded-xl shadow-lg font-semibold text-sm flex items-center gap-2 bg-slate-900 text-white">
+            <i class="fa-solid fa-circle-check text-emerald-400"></i>
+            <span id="toastMessage">Ponto registrado com sucesso!</span>
+        </div>
+    </div>
+
+    <!-- LÓGICA JAVASCRIPT NATIVA -->
+    <script>
+        // ================= ESTADO GLOBAL E STORAGE =================
+        let currentGeoLocation = { lat: null, lng: null, text: "GPS não capturado" };
+        let activePunchType = "";
+        let activePunchCategory = "";
+        let vetIdToDelete = null;
+        let currentUser = null;
+        let isCoordUnlocked = false;
+
+        // Recupera registros de ponto armazenados no localStorage
+        let logs = JSON.parse(localStorage.getItem('hovet_ponto_logs') || '[]');
+
+        // Dados Iniciais de Médicos Veterinários Cadastrados
+        const initialVets = [
+            { id: 1, name: "Dr. Roberto Alves", role: "Coordenador Veterinário", accessLevel: "Coordenação", email: "coord.hovet@ufmt.br", password: "admin", status: "Ativo" },
+            { id: 2, name: "Dra. Ana Silva", role: "Médica Veterinária", accessLevel: "Colaborador", email: "ana.silva@ufmt.br", password: "123", status: "Ativo" },
+            { id: 3, name: "Dr. Carlos Eduardo", role: "Cirurgião Veterinário", accessLevel: "Colaborador", email: "carlos.eduardo@ufmt.br", password: "123", status: "Ativo" },
+            { id: 4, name: "Dra. Juliana Lima", role: "Plantonista Veterinário", accessLevel: "Colaborador", email: "juliana.lima@ufmt.br", password: "123", status: "Ativo" },
+            { id: 5, name: "Mariana Costa", role: "Enfermeira Veterinária", accessLevel: "Colaborador", email: "mariana.costa@ufmt.br", password: "123", status: "Ativo" }
+        ];
+
+        let vetList = JSON.parse(localStorage.getItem('hovet_medicos_v1') || 'null');
+        if (!vetList) {
+            vetList = initialVets;
+            localStorage.setItem('hovet_medicos_v1', JSON.stringify(vetList));
+        }
+
+        // ================= INICIALIZAÇÃO DA APLICAÇÃO =================
+        window.onload = function() {
+            startClock();
+            initGeolocation();
+            
+            // Seta o mês atual nos relatórios
+            const now = new Date();
+            const yearMonth = now.toISOString().slice(0, 7);
+            document.getElementById('coordFilterMonth').value = yearMonth;
+
+            // Verifica sessão salva
+            const savedUser = localStorage.getItem('hovet_current_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                initAuthenticatedUser();
+            } else {
+                document.getElementById('loginScreen').classList.remove('hidden');
+            }
+        };
+
+        // ================= RELÓGIO DIGITAL EM TEMPO REAL =================
+        function startClock() {
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('pt-BR');
+            const dateOptions = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
+            const dateStr = now.toLocaleDateString('pt-BR', dateOptions);
+
+            document.getElementById('liveClock').textContent = timeStr;
+            document.getElementById('liveDate').textContent = dateStr;
+        }
+
+        // ================= GEOLOCALIZAÇÃO =================
+        function initGeolocation() {
+            const statusBox = document.getElementById('geoStatusBox');
+            const statusText = document.getElementById('geoStatusText');
+            const geoIcon = document.getElementById('geoIcon');
+
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude.toFixed(6);
+                        const lng = position.coords.longitude.toFixed(6);
+                        currentGeoLocation = {
+                            lat: lat,
+                            lng: lng,
+                            text: `${lat}, ${lng}`
+                        };
+
+                        statusText.textContent = `Localização capturada: Lat ${lat}, Lng ${lng} (Precisão de GPS ok)`;
+                        statusBox.className = "bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between shadow-sm";
+                        geoIcon.className = "w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-lg font-bold";
+                        geoIcon.innerHTML = `<i class="fa-solid fa-location-dot"></i>`;
+                    },
+                    (error) => {
+                        currentGeoLocation = { lat: null, lng: null, text: "GPS Indisponível/Negado" };
+                        statusText.textContent = "Aviso: Não foi possível obter o GPS exato. O ponto registrará sem coordenadas completas.";
+                        statusBox.className = "bg-rose-50 border border-rose-200 rounded-2xl p-4 flex items-center justify-between shadow-sm";
+                        geoIcon.className = "w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center text-lg font-bold";
+                        geoIcon.innerHTML = `<i class="fa-solid fa-location-crosshairs"></i>`;
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            } else {
+                currentGeoLocation = { lat: null, lng: null, text: "Navegador sem suporte a GPS" };
+                statusText.textContent = "Seu navegador não suporta geolocalização automática.";
+            }
+        }
+
+        // ================= SISTEMA DE AUTENTICAÇÃO =================
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+            const password = document.getElementById('loginPassword').value;
+
+            const vet = vetList.find(v => v.email.toLowerCase() === email && v.password === password);
+
+            if (vet) {
+                if (vet.status !== "Ativo") {
+                    showLoginError("Este perfil está inativo no sistema. Procure a coordenação.");
+                    return;
+                }
+                currentUser = vet;
+                isCoordUnlocked = (currentUser.accessLevel === "Coordenação");
+                localStorage.setItem('hovet_current_user', JSON.stringify(currentUser));
+                document.getElementById('loginError').classList.add('hidden');
+                document.getElementById('loginForm').reset();
+                initAuthenticatedUser();
+            } else {
+                showLoginError("E-mail ou senha incorretos!");
+            }
+        }
+
+        function showLoginError(msg) {
+            const errDiv = document.getElementById('loginError');
+            document.getElementById('loginErrorMessage').textContent = msg;
+            errDiv.classList.remove('hidden');
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            isCoordUnlocked = false;
+            localStorage.removeItem('hovet_current_user');
+            switchTab('register');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            showToast("Sessão encerrada com sucesso.", "info");
+        }
+
+        function initAuthenticatedUser() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('currentUserDisplayName').textContent = currentUser.name;
+            document.getElementById('currentUserDisplayRole').textContent = `${currentUser.role} • ${currentUser.accessLevel || 'Colaborador'}`;
+
+            if (currentUser.accessLevel === "Coordenação") {
+                isCoordUnlocked = true;
+            }
+
+            syncVetDropdowns();
+            renderRecentLogs();
+        }
+
+        // ================= SINCRONIZAÇÃO DE DROPDOWNS =================
+        function syncVetDropdowns() {
+            const coordSelect = document.getElementById('coordFilterVet');
+            
+            coordSelect.innerHTML = '<option value="ALL">Todos os Profissionais</option>' +
+                vetList.map(v => `<option value="${v.name}">${v.name} (${v.role})</option>`).join('');
+        }
+
+        // ================= SEÇÃO: REGISTRO DE PONTO E MODAL =================
+        function openJustificationModal(type, colorTheme) {
+            if (!currentUser) {
+                document.getElementById('loginScreen').classList.remove('hidden');
+                return;
+            }
+
+            activePunchType = type;
+            document.getElementById('modalTitleType').textContent = `Registrar ${type}`;
+            document.getElementById('modalCurrentTime').textContent = new Date().toLocaleTimeString('pt-BR');
+            document.getElementById('modalGeoLocation').textContent = currentGeoLocation.text;
+            
+            document.getElementById('modalReasonCategory').value = "Sem alteração (No horário)";
+            document.getElementById('modalReasonNotes').value = "";
+
+            document.getElementById('justificationModal').classList.remove('hidden');
+        }
+
+        function closeJustificationModal() {
+            document.getElementById('justificationModal').classList.add('hidden');
+        }
+
+        function confirmPunchRegistration(e) {
+            e.preventDefault();
+            const now = new Date();
+
+            const reasonCategory = document.getElementById('modalReasonCategory').value;
+            const notes = document.getElementById('modalReasonNotes').value.trim();
+
+            const newLog = {
+                id: Date.now(),
+                vetName: currentUser.name,
+                vetRole: currentUser.role,
+                timestamp: now.toISOString(),
+                formattedDate: now.toLocaleDateString('pt-BR'),
+                formattedTime: now.toLocaleTimeString('pt-BR'),
+                type: activePunchType,
+                reasonCategory: reasonCategory,
+                notes: notes,
+                location: currentGeoLocation.text,
+                lat: currentGeoLocation.lat,
+                lng: currentGeoLocation.lng
+            };
+
+            logs.unshift(newLog); // Adiciona no início
+            localStorage.setItem('hovet_ponto_logs', JSON.stringify(logs));
+
+            closeJustificationModal();
+            showToast(`Ponto de ${activePunchType} registrado com sucesso!`);
+            renderRecentLogs();
+        }
+
+        function renderRecentLogs() {
+            const tbody = document.getElementById('recentLogsTable');
+            if (!currentUser) return;
+
+            // Filtra logs pertencentes apenas ao usuário logado
+            const myLogs = logs.filter(l => l.vetName === currentUser.name).slice(0, 5);
+
+            if (myLogs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-6 text-center text-slate-400">Nenhum registro efetuado hoje.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = myLogs.map(log => {
+                let badgeColor = "bg-slate-100 text-slate-700";
+                if (log.type.includes("Entrada")) badgeColor = "bg-emerald-100 text-emerald-800";
+                if (log.type.includes("Saída")) badgeColor = "bg-rose-100 text-rose-800";
+                if (log.type.includes("Almoço")) badgeColor = "bg-amber-100 text-amber-800";
+                if (log.type.includes("Plantão")) badgeColor = "bg-purple-100 text-purple-800";
+
+                const mapsUrl = (log.lat && log.lng) ? `https://www.google.com/maps?q=${log.lat},${log.lng}` : "#";
+
+                return `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="px-4 py-3 font-mono text-xs font-semibold">
+                            ${log.formattedDate} <span class="text-slate-400 font-normal">${log.formattedTime}</span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-bold ${badgeColor}">
+                                ${log.type}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-xs">
+                            <div class="font-semibold text-slate-700">${log.reasonCategory}</div>
+                            ${log.notes ? `<div class="text-slate-400 text-[11px] italic">${log.notes}</div>` : ''}
+                        </td>
+                        <td class="px-4 py-3 text-xs">
+                            ${(log.lat && log.lng) ? 
+                                `<a href="${mapsUrl}" target="_blank" class="text-ufmt-700 font-mono hover:underline flex items-center gap-1">
+                                    <i class="fa-solid fa-map-pin"></i> ${log.location}
+                                </a>` : 
+                                `<span class="text-slate-400">${log.location}</span>`}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ================= SEÇÃO: PAINEL DA COORDENAÇÃO =================
+        function updateCoordinationDashboard() {
+            const selectedMonth = document.getElementById('coordFilterMonth').value; // Formato "YYYY-MM"
+            const selectedVet = document.getElementById('coordFilterVet').value;
+
+            const filteredLogs = logs.filter(log => {
+                const logMonth = log.timestamp.slice(0, 7);
+                const matchMonth = selectedMonth ? logMonth === selectedMonth : true;
+                const matchVet = selectedVet !== "ALL" ? log.vetName === selectedVet : true;
+                return matchMonth && matchVet;
+            });
+
+            // Renderiza tabela filtrada
+            const tbody = document.getElementById('coordLogsTable');
+            if (filteredLogs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-6 text-center text-slate-400">Nenhum ponto registrado para os filtros selecionados.</td></tr>`;
+            } else {
+                tbody.innerHTML = filteredLogs.map(log => `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="px-4 py-3 font-bold text-slate-800">${log.vetName} <br><span class="text-[10px] text-slate-400 font-normal">${log.vetRole}</span></td>
+                        <td class="px-4 py-3 font-mono text-xs">${log.formattedDate} ${log.formattedTime}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-800">${log.type}</span>
+                        </td>
+                        <td class="px-4 py-3 text-xs font-medium text-slate-700">${log.reasonCategory}</td>
+                        <td class="px-4 py-3 text-xs text-slate-500">${log.notes || '-'}</td>
+                        <td class="px-4 py-3 text-xs font-mono">${log.location}</td>
+                    </tr>
+                `).join('');
+            }
+
+            // Cálculos Resumidos de Horas
+            let totalMinutesRegular = 0;
+            let totalMinutesPlantao = 0;
+            let totalOcorrencias = 0;
+
+            filteredLogs.forEach(log => {
+                if (log.reasonCategory && log.reasonCategory !== "Sem alteração (No horário)") {
+                    totalOcorrencias++;
+                }
+
+                // Cálculo simples de carga por tipo de batida
+                if (log.type === "Entrada Plantão") totalMinutesPlantao += 12 * 60; // Estima plantão 12h
+                if (log.type === "Entrada") totalMinutesRegular += 4 * 60; // Estima bloco regular de 4h
+            });
+
+            document.getElementById('cardTotalRegular').textContent = formatMinutesToHHMM(totalMinutesRegular);
+            document.getElementById('cardTotalPlantao').textContent = formatMinutesToHHMM(totalMinutesPlantao);
+            document.getElementById('cardTotalOcorrencias').textContent = `${totalOcorrencias} ocorrências`;
+            document.getElementById('cardTotalGeral').textContent = formatMinutesToHHMM(totalMinutesRegular + totalMinutesPlantao);
+        }
+
+        function formatMinutesToHHMM(minutes) {
+            const hrs = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            return `${hrs}h ${mins.toString().padStart(2, '0')}m`;
+        }
+
+        function exportToCSV() {
+            const selectedMonth = document.getElementById('coordFilterMonth').value;
+            const selectedVet = document.getElementById('coordFilterVet').value;
+
+            const filtered = logs.filter(log => {
+                const logMonth = log.timestamp.slice(0, 7);
+                const matchMonth = selectedMonth ? logMonth === selectedMonth : true;
+                const matchVet = selectedVet !== "ALL" ? log.vetName === selectedVet : true;
+                return matchMonth && matchVet;
+            });
+
+            if (filtered.length === 0) {
+                showToast("Sem dados para exportar no período selecionado.", "warning");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Colaborador,Cargo,Data,Hora,Tipo de Ponto,Justificativa,Observacoes,GPS\n";
+
+            filtered.forEach(l => {
+                const row = [
+                    `"${l.vetName}"`,
+                    `"${l.vetRole}"`,
+                    `"${l.formattedDate}"`,
+                    `"${l.formattedTime}"`,
+                    `"${l.type}"`,
+                    `"${l.reasonCategory}"`,
+                    `"${l.notes || ''}"`,
+                    `"${l.location}"`
+                ].join(",");
+                csvContent += row + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `PONTO_HOVET_UFMT_${selectedMonth || 'GERAL'}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // ================= SEÇÃO: CADASTRO DE VETERINÁRIOS =================
+        function renderVetList() {
+            const tbody = document.getElementById('vetListTable');
+            tbody.innerHTML = vetList.map(vet => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="px-6 py-4 font-bold text-slate-800">${vet.name}</td>
+                    <td class="px-6 py-4 text-xs font-semibold text-ufmt-900">${vet.role}</td>
+                    <td class="px-6 py-4 text-xs font-bold ${vet.accessLevel === 'Coordenação' ? 'text-purple-700 bg-purple-50 px-2 py-1 rounded-md' : 'text-slate-600'}">${vet.accessLevel || 'Colaborador'}</td>
+                    <td class="px-6 py-4 text-xs font-mono text-slate-600">${vet.email || '<span class="text-slate-400">Não informado</span>'}</td>
+                    <td class="px-6 py-4 text-xs font-mono text-slate-400">••••••••</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2.5 py-1 rounded-full text-xs font-bold ${vet.status === 'Ativo' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'}">
+                            ${vet.status}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-right space-x-2">
+                        <button onclick="editVet(${vet.id})" class="text-ufmt-700 hover:text-ufmt-900 p-1.5 rounded-lg hover:bg-slate-100 transition" title="Editar">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button onclick="deleteVet(${vet.id})" class="text-rose-600 hover:text-rose-800 p-1.5 rounded-lg hover:bg-rose-50 transition" title="Remover">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function saveVetForm(e) {
+            e.preventDefault();
+            const id = document.getElementById('vetFormId').value;
+            const name = document.getElementById('vetFormName').value.trim();
+            const role = document.getElementById('vetFormRole').value;
+            const accessLevel = document.getElementById('vetFormAccessLevel').value;
+            const email = document.getElementById('vetFormEmail').value.trim();
+            const password = document.getElementById('vetFormPassword').value;
+            const status = document.getElementById('vetFormStatus').value;
+
+            if (id) {
+                // Editar existente
+                const index = vetList.findIndex(v => v.id == id);
+                if (index !== -1) {
+                    vetList[index] = { id: Number(id), name, role, accessLevel, email, password, status };
+                    showToast("Cadastro atualizado com sucesso!", "success");
+                }
+            } else {
+                // Novo cadastro
+                const newVet = {
+                    id: Date.now(),
+                    name,
+                    role,
+                    accessLevel,
+                    email,
+                    password,
+                    status
+                };
+                vetList.push(newVet);
+                showToast("Médico veterinário cadastrado com sucesso!", "success");
+            }
+
+            localStorage.setItem('hovet_medicos_v1', JSON.stringify(vetList));
+            resetVetForm();
+            syncVetDropdowns();
+            renderVetList();
+        }
+
+        function editVet(id) {
+            const vet = vetList.find(v => v.id === id);
+            if (!vet) return;
+
+            document.getElementById('vetFormId').value = vet.id;
+            document.getElementById('vetFormName').value = vet.name;
+            document.getElementById('vetFormRole').value = vet.role;
+            document.getElementById('vetFormAccessLevel').value = vet.accessLevel || "Colaborador";
+            document.getElementById('vetFormEmail').value = vet.email || "";
+            document.getElementById('vetFormPassword').value = vet.password || "";
+            document.getElementById('vetFormStatus').value = vet.status;
+
+            document.getElementById('vetFormTitle').textContent = "Editar Cadastro de Veterinário";
+            document.getElementById('vetCancelBtn').classList.remove('hidden');
+        }
+
+        function deleteVet(id) {
+            vetIdToDelete = id;
+            document.getElementById('confirmDeleteModal').classList.remove('hidden');
+        }
+
+        function confirmDeleteVet() {
+            if (vetIdToDelete !== null) {
+                vetList = vetList.filter(v => v.id !== vetIdToDelete);
+                localStorage.setItem('hovet_medicos_v1', JSON.stringify(vetList));
+                syncVetDropdowns();
+                renderVetList();
+                showToast("Cadastro removido com sucesso.");
+            }
+            closeDeleteModal();
+        }
+
+        function closeDeleteModal() {
+            vetIdToDelete = null;
+            document.getElementById('confirmDeleteModal').classList.add('hidden');
+        }
+
+        function resetVetForm() {
+            document.getElementById('vetForm').reset();
+            document.getElementById('vetFormId').value = "";
+            document.getElementById('vetFormTitle').textContent = "Cadastrar Novo Médico / Colaborador";
+            document.getElementById('vetCancelBtn').classList.add('hidden');
+        }
+
+        function switchCoordSubTab(sub) {
+            const btnReports = document.getElementById('coordSubTabBtnReports');
+            const btnVets = document.getElementById('coordSubTabBtnVets');
+            const viewReports = document.getElementById('coordSubTabReports');
+            const viewVets = document.getElementById('coordSubTabVets');
+
+            if (sub === 'reports') {
+                btnReports.className = "pb-3 border-b-2 border-ufmt-800 font-bold text-ufmt-800 text-sm flex items-center gap-2";
+                btnVets.className = "pb-3 border-b-2 border-transparent font-medium text-slate-500 hover:text-slate-800 text-sm flex items-center gap-2";
+                viewReports.classList.remove('hidden');
+                viewVets.classList.add('hidden');
+                updateCoordinationDashboard();
+            } else {
+                btnVets.className = "pb-3 border-b-2 border-ufmt-800 font-bold text-ufmt-800 text-sm flex items-center gap-2";
+                btnReports.className = "pb-3 border-b-2 border-transparent font-medium text-slate-500 hover:text-slate-800 text-sm flex items-center gap-2";
+                viewVets.classList.remove('hidden');
+                viewReports.classList.add('hidden');
+                renderVetList();
+            }
+        }
+
+        // Alternar Abas Principais com Restrição de Acesso
+        function switchTab(tab) {
+            const tabReg = document.getElementById('tabRegister');
+            const tabCoord = document.getElementById('tabCoordination');
+
+            const btnReg = document.getElementById('tabBtnRegister');
+            const btnCoord = document.getElementById('tabBtnCoordination');
+
+            if (tab === 'coordination') {
+                // Se o usuário logado NÃO é da coordenação e a aba não foi liberada por PIN
+                if (currentUser && currentUser.accessLevel !== 'Coordenação' && !isCoordUnlocked) {
+                    document.getElementById('coordAuthModal').classList.remove('hidden');
+                    return;
+                }
+            }
+
+            btnReg.className = "px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 text-white/80 hover:bg-white/10 hover:text-white";
+            btnCoord.className = "px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 text-white/80 hover:bg-white/10 hover:text-white";
+
+            tabReg.classList.add('hidden');
+            tabCoord.classList.add('hidden');
+
+            if (tab === 'register') {
+                tabReg.classList.remove('hidden');
+                btnReg.className = "px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 bg-white text-ufmt-900 shadow";
+                syncVetDropdowns();
+                renderRecentLogs();
+            } else if (tab === 'coordination') {
+                tabCoord.classList.remove('hidden');
+                btnCoord.className = "px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 bg-white text-ufmt-900 shadow";
+                syncVetDropdowns();
+                updateCoordinationDashboard();
+                renderVetList();
+            }
+        }
+
+        function handleCoordAuthSubmit(e) {
+            e.preventDefault();
+            const pin = document.getElementById('coordAuthPin').value;
+            // Valida PIN ou Senha de qualquer usuário de Nível Coordenação
+            const coordAccount = vetList.find(v => v.accessLevel === 'Coordenação' && v.password === pin);
+            
+            if (pin === "admin" || coordAccount) {
+                isCoordUnlocked = true;
+                document.getElementById('coordAuthModal').classList.add('hidden');
+                document.getElementById('coordAuthPin').value = "";
+                document.getElementById('coordAuthError').classList.add('hidden');
+                
+                // Abre a aba da coordenação sem re-desencadear a checagem de modal
+                const tabReg = document.getElementById('tabRegister');
+                const tabCoord = document.getElementById('tabCoordination');
+                const btnReg = document.getElementById('tabBtnRegister');
+                const btnCoord = document.getElementById('tabBtnCoordination');
+
+                btnReg.className = "px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 text-white/80 hover:bg-white/10 hover:text-white";
+                btnCoord.className = "px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 bg-white text-ufmt-900 shadow";
+
+                tabReg.classList.add('hidden');
+                tabCoord.classList.remove('hidden');
+
+                syncVetDropdowns();
+                updateCoordinationDashboard();
+                renderVetList();
+
+                showToast("Acesso à Coordenação liberado!", "success");
+            } else {
+                document.getElementById('coordAuthError').classList.remove('hidden');
+            }
+        }
+
+        function closeCoordAuthModal() {
+            document.getElementById('coordAuthModal').classList.add('hidden');
+            document.getElementById('coordAuthPin').value = "";
+            document.getElementById('coordAuthError').classList.add('hidden');
+        }
+
+        // Toast de Notificação
+        function showToast(msg, type = "success") {
+            const toast = document.getElementById('toastNotification');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastMessage.textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
