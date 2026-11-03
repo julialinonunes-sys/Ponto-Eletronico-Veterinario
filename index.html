@@ -1,15 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ponto Eletrônico - HOVET UFMT Sinop</title>
     <link rel="manifest" href="manifest.json">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ponto Eletrônico - HOVET UFMT Sinop</title>
-</head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ponto Eletrônico - HOVET UFMT Sinop</title>
+    
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts Inter -->
@@ -261,7 +257,7 @@
             </div>
         </div>
 
-        <!-- ABA 2: RELATÓRIO MENSAL (NA MESMA LINHA) -->
+        <!-- ABA 2: RELATÓRIO MENSAL -->
         <div id="tabCoordination" class="space-y-6 hidden">
             <div class="flex border-b border-slate-200 gap-4">
                 <button id="coordSubTabBtnReports" onclick="switchCoordSubTab('reports')" class="pb-3 border-b-2 border-ufmt-800 font-bold text-ufmt-800 text-sm flex items-center gap-2">
@@ -342,7 +338,7 @@
                     </div>
                 </div>
 
-                <!-- TABELA DIÁRIA NA MESMA LINHA -->
+                <!-- TABELA DIÁRIA -->
                 <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
                     <h3 class="text-base font-bold text-slate-800">Relatório Mensal de Frequência Diária</h3>
 
@@ -528,7 +524,7 @@
         </div>
     </div>
 
-    <!-- TOAST -->
+    <!-- TOAST NOTIFICATION -->
     <div id="toastNotification" class="fixed bottom-4 right-4 z-50 transform translate-y-20 opacity-0 transition-all duration-300">
         <div id="toastContent" class="px-4 py-3 rounded-xl shadow-lg font-semibold text-sm flex items-center gap-2 bg-slate-900 text-white">
             <i class="fa-solid fa-circle-check text-emerald-400"></i>
@@ -536,7 +532,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT FIREBASE -->
+    <!-- SCRIPT FIREBASE (MÓDULO) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
@@ -575,7 +571,7 @@
         window.dispatchEvent(new Event('firebase-ready'));
     </script>
 
-    <!-- REGRAS DE NEGÓCIO E CÁLCULO DE HORAS -->
+    <!-- REGRAS DE NEGÓCIO E LÓGICA DO SISTEMA -->
     <script>
         let currentGeoLocation = { lat: null, lng: null, text: "GPS não capturado" };
         let activePunchType = "";
@@ -595,13 +591,18 @@
 
             window.onAuthStateChanged(window.firebaseAuth, async (user) => {
                 if (user) {
-                    const q = window.query(window.collection(window.firebaseDb, 'vets'), window.where('email', '==', user.email));
-                    const snapshot = await window.getDocs(q);
-                    if (!snapshot.empty) {
-                        const docData = snapshot.docs[0].data();
-                        currentUser = { id: snapshot.docs[0].id, uid: user.uid, ...docData };
-                    } else {
-                        currentUser = { uid: user.uid, email: user.email, name: user.displayName || user.email, role: "Colaborador", accessLevel: "Colaborador" };
+                    try {
+                        const q = window.query(window.collection(window.firebaseDb, 'users'), window.where('email', '==', user.email));
+                        const snapshot = await window.getDocs(q);
+                        if (!snapshot.empty) {
+                            const docData = snapshot.docs[0].data();
+                            currentUser = { id: snapshot.docs[0].id, uid: user.uid, name: docData.name || docData.userName || user.email, ...docData };
+                        } else {
+                            currentUser = { uid: user.uid, email: user.email, name: user.displayName || user.email, role: "Colaborador", accessLevel: "Colaborador" };
+                        }
+                    } catch (e) {
+                        console.error("Erro ao carregar usuário:", e);
+                        currentUser = { uid: user.uid, email: user.email, name: user.email, role: "Colaborador", accessLevel: "Colaborador" };
                     }
                     initAuthenticatedUser();
                 } else {
@@ -634,7 +635,6 @@
         function initGeolocation() {
             const statusBox = document.getElementById('geoStatusBox');
             const statusText = document.getElementById('geoStatusText');
-            const geoIcon = document.getElementById('geoIcon');
 
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
@@ -689,7 +689,7 @@
         function initAuthenticatedUser() {
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('currentUserDisplayName').textContent = currentUser.name;
-            document.getElementById('currentUserDisplayRole').textContent = `${currentUser.role} • ${currentUser.accessLevel || 'Colaborador'}`;
+            document.getElementById('currentUserDisplayRole').textContent = `${currentUser.role || 'Colaborador'} • ${currentUser.accessLevel || 'Colaborador'}`;
 
             const filterContainer = document.getElementById('filterVetContainer');
             const navLabel = document.getElementById('navCoordinationLabel');
@@ -710,7 +710,7 @@
         }
 
         function loadVetsFromFirestore() {
-            window.onSnapshot(window.collection(window.firebaseDb, 'vets'), (snapshot) => {
+            window.onSnapshot(window.collection(window.firebaseDb, 'users'), (snapshot) => {
                 vetList = [];
                 snapshot.forEach((docSnap) => {
                     vetList.push({ id: docSnap.id, ...docSnap.data() });
@@ -721,11 +721,41 @@
         }
 
         function loadLogsFromFirestore() {
-            const q = window.query(window.collection(window.firebaseDb, 'ponto_logs'), window.orderBy('timestamp', 'asc'));
+            const q = window.query(window.collection(window.firebaseDb, 'punches'), window.orderBy('timestamp', 'asc'));
             window.onSnapshot(q, (snapshot) => {
                 logs = [];
                 snapshot.forEach((docSnap) => {
-                    logs.push({ id: docSnap.id, ...docSnap.data() });
+                    const data = docSnap.data();
+                    let locText = "GPS não informado";
+                    let lat = null, lng = null;
+
+                    if (data.location) {
+                        if (typeof data.location === 'object') {
+                            lat = data.location.latitude;
+                            lng = data.location.longitude;
+                            locText = (lat && lng) ? `${lat}, ${lng}` : "GPS capturado";
+                        } else {
+                            locText = data.location;
+                            lat = data.lat;
+                            lng = data.lng;
+                        }
+                    }
+
+                    logs.push({
+                        id: docSnap.id,
+                        vetName: data.userName || data.vetName || "Colaborador",
+                        vetRole: data.vetRole || "Médico Veterinário",
+                        timestamp: data.timestamp,
+                        formattedDate: data.date || data.formattedDate,
+                        formattedTime: data.time || data.formattedTime,
+                        type: data.type,
+                        reasonCategory: data.reasonCategory || "Sem alteração (No horário)",
+                        notes: data.notes || "",
+                        location: locText,
+                        lat: lat,
+                        lng: lng,
+                        userId: data.userId
+                    });
                 });
                 renderRecentLogs();
                 if (!document.getElementById('tabCoordination').classList.contains('hidden')) {
@@ -738,7 +768,7 @@
             const coordSelect = document.getElementById('coordFilterVet');
             if (!coordSelect) return;
             coordSelect.innerHTML = '<option value="ALL">Todos os Profissionais</option>' +
-                vetList.map(v => `<option value="${v.name}">${v.name} (${v.role})</option>`).join('');
+                vetList.map(v => `<option value="${v.name || v.userName}">${v.name || v.userName} (${v.role || 'Médico'})</option>`).join('');
         }
 
         function openJustificationModal(type) {
@@ -763,24 +793,31 @@
             const notes = document.getElementById('modalReasonNotes').value.trim();
 
             const newLog = {
-                vetName: currentUser.name,
-                vetRole: currentUser.role,
-                timestamp: now.toISOString(),
-                formattedDate: now.toLocaleDateString('pt-BR'),
-                formattedTime: now.toLocaleTimeString('pt-BR'),
+                userId: currentUser.uid || currentUser.id || "",
+                userName: currentUser.name || "Colaborador",
+                vetRole: currentUser.role || "Médico Veterinário",
                 type: activePunchType,
+                date: now.toISOString().slice(0, 10),
+                time: now.toLocaleTimeString('pt-BR'),
+                timestamp: now.toISOString(),
                 reasonCategory: reasonCategory,
                 notes: notes,
-                location: currentGeoLocation.text,
-                lat: currentGeoLocation.lat,
-                lng: currentGeoLocation.lng
+                location: {
+                    latitude: currentGeoLocation.lat ? parseFloat(currentGeoLocation.lat) : null,
+                    longitude: currentGeoLocation.lng ? parseFloat(currentGeoLocation.lng) : null,
+                    accuracy: 10,
+                    googleMapsUrl: (currentGeoLocation.lat && currentGeoLocation.lng) 
+                        ? `https://www.google.com/maps?q=${currentGeoLocation.lat},${currentGeoLocation.lng}` 
+                        : ""
+                }
             };
 
             try {
-                await window.addDoc(window.collection(window.firebaseDb, 'ponto_logs'), newLog);
+                await window.addDoc(window.collection(window.firebaseDb, 'punches'), newLog);
                 closeJustificationModal();
                 showToast(`Ponto de ${activePunchType} registrado com sucesso!`);
             } catch (error) {
+                console.error("Erro no salvamento no Firestore:", error);
                 showToast("Erro ao registrar ponto.", "warning");
             }
         }
@@ -789,7 +826,7 @@
             const tbody = document.getElementById('recentLogsTable');
             if (!currentUser || !tbody) return;
 
-            const myLogs = logs.filter(l => l.vetName === currentUser.name).slice(-5).reverse();
+            const myLogs = logs.filter(l => l.vetName === currentUser.name || l.userId === currentUser.uid).slice(-5).reverse();
 
             if (myLogs.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-6 text-center text-slate-400">Nenhum registro efetuado.</td></tr>`;
@@ -831,7 +868,6 @@
             }).join('');
         }
 
-        // CÁLCULO EXATO DE HORAS POR SEGUNDO
         function updateCoordinationDashboard() {
             const selectedMonth = document.getElementById('coordFilterMonth').value;
             const coordSelectVal = document.getElementById('coordFilterVet').value;
@@ -1011,13 +1047,13 @@
 
             tbody.innerHTML = vetList.map(vet => `
                 <tr class="hover:bg-slate-50 transition">
-                    <td class="px-6 py-4 font-bold text-slate-800">${vet.name}</td>
-                    <td class="px-6 py-4 text-xs font-semibold text-ufmt-900">${vet.role}</td>
+                    <td class="px-6 py-4 font-bold text-slate-800">${vet.name || vet.userName || 'Sem nome'}</td>
+                    <td class="px-6 py-4 text-xs font-semibold text-ufmt-900">${vet.role || 'Médico'}</td>
                     <td class="px-6 py-4 text-xs font-bold ${vet.accessLevel === 'Coordenação' ? 'text-purple-700 bg-purple-50 px-2 py-1 rounded-md' : 'text-slate-600'}">${vet.accessLevel || 'Colaborador'}</td>
                     <td class="px-6 py-4 text-xs font-mono text-slate-600">${vet.email || '<span class="text-slate-400">Não informado</span>'}</td>
                     <td class="px-6 py-4">
                         <span class="px-2.5 py-1 rounded-full text-xs font-bold ${vet.status === 'Ativo' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'}">
-                            ${vet.status}
+                            ${vet.status || 'Ativo'}
                         </span>
                     </td>
                     <td class="px-6 py-4 text-right space-x-2">
@@ -1044,11 +1080,11 @@
 
             try {
                 if (docId) {
-                    const docRef = window.doc(window.firebaseDb, 'vets', docId);
+                    const docRef = window.doc(window.firebaseDb, 'users', docId);
                     await window.updateDoc(docRef, { name, role, accessLevel, email, status });
                     showToast("Cadastro atualizado com sucesso!");
                 } else {
-                    await window.addDoc(window.collection(window.firebaseDb, 'vets'), { name, role, accessLevel, email, status });
+                    await window.addDoc(window.collection(window.firebaseDb, 'users'), { name, role, accessLevel, email, status });
                     try {
                         await window.createUserWithEmailAndPassword(window.firebaseAuth, email, password);
                     } catch (authErr) {
@@ -1058,6 +1094,7 @@
                 }
                 resetVetForm();
             } catch (error) {
+                console.error("Erro ao salvar profissional:", error);
                 showToast("Erro ao salvar dados no Firebase.", "warning");
             }
         }
@@ -1067,12 +1104,12 @@
             if (!vet) return;
 
             document.getElementById('vetFormDocId').value = vet.id;
-            document.getElementById('vetFormName').value = vet.name;
-            document.getElementById('vetFormRole').value = vet.role;
+            document.getElementById('vetFormName').value = vet.name || vet.userName || "";
+            document.getElementById('vetFormRole').value = vet.role || "Médico Veterinário";
             document.getElementById('vetFormAccessLevel').value = vet.accessLevel || "Colaborador";
             document.getElementById('vetFormEmail').value = vet.email || "";
             document.getElementById('vetFormPassword').value = "********";
-            document.getElementById('vetFormStatus').value = vet.status;
+            document.getElementById('vetFormStatus').value = vet.status || "Ativo";
 
             document.getElementById('vetFormTitle').textContent = "Editar Cadastro de Veterinário";
             document.getElementById('vetCancelBtn').classList.remove('hidden');
@@ -1086,9 +1123,10 @@
         async function confirmDeleteVet() {
             if (vetIdToDelete !== null) {
                 try {
-                    await window.deleteDoc(window.doc(window.firebaseDb, 'vets', vetIdToDelete));
+                    await window.deleteDoc(window.doc(window.firebaseDb, 'users', vetIdToDelete));
                     showToast("Cadastro removido com sucesso.");
                 } catch (error) {
+                    console.error("Erro ao remover:", error);
                     showToast("Erro ao remover cadastro.", "warning");
                 }
             }
@@ -1152,11 +1190,18 @@
             }
         }
 
-        function showToast(msg) {
+        function showToast(msg, type = "success") {
             const toast = document.getElementById('toastNotification');
             const toastMessage = document.getElementById('toastMessage');
+            const toastContent = document.getElementById('toastContent');
             
             toastMessage.textContent = msg;
+            if (type === "warning") {
+                toastContent.className = "px-4 py-3 rounded-xl shadow-lg font-semibold text-sm flex items-center gap-2 bg-rose-900 text-white";
+            } else {
+                toastContent.className = "px-4 py-3 rounded-xl shadow-lg font-semibold text-sm flex items-center gap-2 bg-slate-900 text-white";
+            }
+
             toast.classList.remove('translate-y-20', 'opacity-0');
             
             setTimeout(() => {
