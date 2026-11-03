@@ -3,18 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ponto Eletrônico - HOVET UFMT</title>
+  <title>Ponto Eletrônico - HOVET UFMT Sinop</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .bg-hovet-blue { background-color: #02598b; }
+    .text-hovet-blue { color: #02598b; }
+    .border-hovet-blue { border-color: #02598b; }
+  </style>
 </head>
-<body class="bg-slate-100 font-sans text-slate-800 antialiased min-h-screen flex flex-col">
+<body class="bg-slate-100 font-sans text-slate-800 antialiased min-h-screen flex flex-col relative">
 
-  <!-- CABEÇALHO DA APLICAÇÃO -->
-  <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-50">
+  <!-- CABEÇALHO -->
+  <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-20">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
       <div class="flex items-center space-x-3">
         <div class="bg-teal-600 p-2 rounded-lg">
-          <i class="fa-solid fa-notes-medical text-2xl text-white"></i>
+          <i class="fa-solid fa-user-doctor text-2xl text-white"></i>
         </div>
         <div>
           <h1 class="text-xl font-bold tracking-tight">Hospital Veterinário - HOVET</h1>
@@ -22,7 +27,7 @@
         </div>
       </div>
 
-      <!-- PAINEL DO UTILIZADOR -->
+      <!-- PAINEL DO UTILIZADOR LOGADO -->
       <div id="user-header-info" class="hidden flex items-center space-x-4">
         <div class="text-right hidden sm:block">
           <p id="header-user-email" class="text-sm font-semibold text-slate-200"></p>
@@ -53,45 +58,19 @@
     </nav>
   </header>
 
-  <!-- CONTEÚDO PRINCIPAL -->
-  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-    <!-- TELA DE LOGIN -->
-    <section id="screen-login" class="max-w-md mx-auto my-12 bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
-      <div class="text-center mb-8">
-        <div class="inline-flex bg-teal-50 p-4 rounded-full text-teal-600 mb-4">
-          <i class="fa-solid fa-lock text-3xl"></i>
-        </div>
-        <h2 class="text-2xl font-bold text-slate-900">Acesso ao Sistema</h2>
-        <p class="text-sm text-slate-500 mt-1">Informe as suas credenciais para continuar</p>
-      </div>
-
-      <form id="form-login" class="space-y-5">
-        <div>
-          <label class="block text-xs font-semibold uppercase text-slate-600 mb-2">E-mail Institucional</label>
-          <div class="relative">
-            <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-slate-400"></i>
-            <input type="email" id="login-email" required placeholder="seu.email@ufmt.br" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-500 text-sm outline-none">
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold uppercase text-slate-600 mb-2">Palavra-passe / Senha</label>
-          <div class="relative">
-            <i class="fa-solid fa-key absolute left-3.5 top-3.5 text-slate-400"></i>
-            <input type="password" id="login-password" required placeholder="••••••••" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-500 text-sm outline-none">
-          </div>
-        </div>
-
-        <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 rounded-lg shadow-md transition-colors flex items-center justify-center space-x-2">
-          <span>Entrar no Sistema</span>
-          <i class="fa-solid fa-arrow-right text-sm"></i>
-        </button>
-      </form>
-    </section>
+  <!-- CONTEÚDO DE FUNDO (TELAS DA APLICAÇÃO) -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 z-10">
 
     <!-- TELA DE REGISTRO DE PONTO -->
     <section id="screen-punch" class="hidden space-y-6">
+      <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-center space-x-3 text-emerald-800 text-sm">
+        <i class="fa-solid fa-location-dot text-emerald-600 text-lg"></i>
+        <div>
+          <span class="font-bold">LOCALIZAÇÃO PARA REGISTRO</span>
+          <p id="location-display" class="text-xs text-emerald-700">Localização capturada: Lat -11.863600, Lng -55.497400</p>
+        </div>
+      </div>
+
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div>
           <h2 class="text-xl font-bold text-slate-900">Registrar Frequência Individual</h2>
@@ -105,7 +84,7 @@
 
       <!-- BOTÕES COLORIDOS DE REGISTRO -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <button id="btn-punch-entrada" class="bg-emerald-500 hover:bg-emerald-600 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+        <button id="btn-punch-entrada" class="bg-emerald-700 hover:bg-emerald-800 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
           <div class="flex justify-between items-center w-full">
             <span class="text-xs uppercase tracking-wider font-bold opacity-80">Início</span>
             <i class="fa-solid fa-right-to-bracket text-2xl"></i>
@@ -116,7 +95,7 @@
           </div>
         </button>
 
-        <button id="btn-punch-almoco-saida" class="bg-amber-500 hover:bg-amber-600 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+        <button id="btn-punch-almoco-saida" class="bg-amber-600 hover:bg-amber-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
           <div class="flex justify-between items-center w-full">
             <span class="text-xs uppercase tracking-wider font-bold opacity-80">Intervalo</span>
             <i class="fa-solid fa-utensils text-2xl"></i>
@@ -127,7 +106,7 @@
           </div>
         </button>
 
-        <button id="btn-punch-almoco-retorno" class="bg-blue-500 hover:bg-blue-600 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+        <button id="btn-punch-almoco-retorno" class="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
           <div class="flex justify-between items-center w-full">
             <span class="text-xs uppercase tracking-wider font-bold opacity-80">Retorno</span>
             <i class="fa-solid fa-rotate-left text-2xl"></i>
@@ -138,7 +117,7 @@
           </div>
         </button>
 
-        <button id="btn-punch-saida" class="bg-rose-500 hover:bg-rose-600 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+        <button id="btn-punch-saida" class="bg-rose-700 hover:bg-rose-800 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
           <div class="flex justify-between items-center w-full">
             <span class="text-xs uppercase tracking-wider font-bold opacity-80">Fim</span>
             <i class="fa-solid fa-right-from-bracket text-2xl"></i>
@@ -149,7 +128,7 @@
           </div>
         </button>
 
-        <button id="btn-punch-plantao-entrada" class="bg-purple-600 hover:bg-purple-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+        <button id="btn-punch-plantao-entrada" class="bg-purple-700 hover:bg-purple-800 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
           <div class="flex justify-between items-center w-full">
             <span class="text-xs uppercase tracking-wider font-bold opacity-80">Plantão</span>
             <i class="fa-solid fa-user-clock text-2xl"></i>
@@ -160,7 +139,7 @@
           </div>
         </button>
 
-        <button id="btn-punch-plantao-saida" class="bg-indigo-600 hover:bg-indigo-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+        <button id="btn-punch-plantao-saida" class="bg-indigo-700 hover:bg-indigo-800 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
           <div class="flex justify-between items-center w-full">
             <span class="text-xs uppercase tracking-wider font-bold opacity-80">Plantão</span>
             <i class="fa-solid fa-house-user text-2xl"></i>
@@ -230,7 +209,55 @@
 
   </main>
 
-  <!-- MODAL DE CADASTRO/EDIÇÃO -->
+  <!-- MODAL DE LOGIN (FLUTUANTE, EXATAMENTE COMO NA SUA FOTO) -->
+  <div id="screen-login" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200">
+      
+      <!-- TOPO AZUL PETRÓLEO DO MODAL DE LOGIN -->
+      <div class="bg-hovet-blue text-white p-8 text-center flex flex-col items-center">
+        <div class="bg-white/10 border border-white/20 rounded-2xl p-3.5 mb-3">
+          <i class="fa-solid fa-user-doctor text-3xl text-white"></i>
+        </div>
+        <h2 class="text-xl font-bold tracking-tight">Hospital Veterinário - HOVET</h2>
+        <p class="text-xs text-blue-100 mt-1">Universidade Federal de Mato Grosso, campus Sinop</p>
+      </div>
+
+      <!-- CORPO DO FORMULÁRIO -->
+      <div class="p-8">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-center text-slate-400 mb-6">Acesso ao Sistema de Ponto</h3>
+
+        <form id="form-login" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">E-mail Institucional</label>
+            <div class="relative">
+              <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-slate-400"></i>
+              <input type="email" id="login-email" required placeholder="seu.email@ufmt.br" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-hovet-blue focus:border-hovet-blue transition-all">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Senha de Acesso</label>
+            <div class="relative">
+              <i class="fa-solid fa-lock absolute left-3.5 top-3.5 text-slate-400"></i>
+              <input type="password" id="login-password" required placeholder="••••••••" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-hovet-blue focus:border-hovet-blue transition-all">
+            </div>
+          </div>
+
+          <button type="submit" class="w-full bg-hovet-blue hover:bg-opacity-90 text-white font-bold py-3.5 rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2 mt-2">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            <span>Entrar no Sistema</span>
+          </button>
+        </form>
+
+        <div class="mt-8 text-center border-t border-slate-100 pt-4">
+          <p class="text-xs text-slate-400">Dúvidas ou problemas de acesso? Procure a Coordenação do HOVET.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL DE CADASTRO/EDIÇÃO DE VETERINÁRIOS -->
   <div id="vet-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 border border-slate-200">
       <div class="flex justify-between items-center border-b pb-3">
@@ -282,7 +309,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT COM A SUA API KEY INTEGRADA -->
+  <!-- SCRIPT FIREBASE -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -405,7 +432,7 @@
     }
 
     function hideAllScreens() {
-      ['screen-login', 'screen-punch', 'screen-report', 'screen-coord'].forEach(id => {
+      ['screen-punch', 'screen-report', 'screen-coord'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('hidden');
       });
@@ -527,7 +554,7 @@
       }
     }
 
-    // MODAL
+    // MODAL VETS
     document.getElementById('btn-open-modal').addEventListener('click', () => {
       document.getElementById('form-vet').reset();
       document.getElementById('vet-id').value = '';
