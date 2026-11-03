@@ -105,7 +105,7 @@
 
       <!-- BOTÕES DE BATE-PONTO -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <button onclick="registerPunch('Entrada')" class="bg-emerald-600 hover:bg-emerald-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+        <button id="btn-punch-entrada" class="bg-emerald-600 hover:bg-emerald-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
           <div class="flex justify-between items-center w-full">
             <span class="text-xs uppercase tracking-wider font-bold opacity-80">Início</span>
             <i class="fa-solid fa-right-to-bracket text-2xl"></i>
@@ -116,7 +116,7 @@
           </div>
         </button>
 
-        <button onclick="registerPunch('Saída Almoço')" class="bg-amber-600 hover:bg-amber-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+        <button id="btn-punch-almoco-saida" class="bg-amber-600 hover:bg-amber-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
           <div class="flex justify-between items-center w-full">
             <span class="text-xs uppercase tracking-wider font-bold opacity-80">Intervalo</span>
             <i class="fa-solid fa-utensils text-2xl"></i>
@@ -127,7 +127,7 @@
           </div>
         </button>
 
-        <button onclick="registerPunch('Retorno Almoço')" class="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+        <button id="btn-punch-almoco-retorno" class="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
           <div class="flex justify-between items-center w-full">
             <span class="text-xs uppercase tracking-wider font-bold opacity-80">Retorno</span>
             <i class="fa-solid fa-rotate-left text-2xl"></i>
@@ -138,7 +138,7 @@
           </div>
         </button>
 
-        <button onclick="registerPunch('Saída')" class="bg-rose-600 hover:bg-rose-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+        <button id="btn-punch-saida" class="bg-rose-600 hover:bg-rose-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
           <div class="flex justify-between items-center w-full">
             <span class="text-xs uppercase tracking-wider font-bold opacity-80">Fim</span>
             <i class="fa-solid fa-right-from-bracket text-2xl"></i>
@@ -149,7 +149,7 @@
           </div>
         </button>
 
-        <button onclick="registerPunch('Entrada Plantão')" class="bg-purple-600 hover:bg-purple-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+        <button id="btn-punch-plantao-entrada" class="bg-purple-600 hover:bg-purple-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
           <div class="flex justify-between items-center w-full">
             <span class="text-xs uppercase tracking-wider font-bold opacity-80">Plantão</span>
             <i class="fa-solid fa-user-clock text-2xl"></i>
@@ -160,7 +160,7 @@
           </div>
         </button>
 
-        <button onclick="registerPunch('Saída Plantão')" class="bg-indigo-600 hover:bg-indigo-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+        <button id="btn-punch-plantao-saida" class="bg-indigo-600 hover:bg-indigo-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
           <div class="flex justify-between items-center w-full">
             <span class="text-xs uppercase tracking-wider font-bold opacity-80">Plantão</span>
             <i class="fa-solid fa-house-user text-2xl"></i>
@@ -203,7 +203,7 @@
           <h2 class="text-xl font-bold text-slate-900">Painel de Gestão da Coordenação</h2>
           <p class="text-sm text-slate-500">Gerenciamento de médicos veterinários e controle de pontos.</p>
         </div>
-        <button onclick="openVetModal()" class="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2.5 rounded-lg shadow-sm flex items-center space-x-2 text-sm transition-colors">
+        <button id="btn-open-modal" class="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2.5 rounded-lg shadow-sm flex items-center space-x-2 text-sm transition-colors">
           <i class="fa-solid fa-user-plus"></i>
           <span>Novo Veterinário</span>
         </button>
@@ -241,12 +241,12 @@
     <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 border border-slate-200">
       <div class="flex justify-between items-center border-b pb-3">
         <h3 id="modal-title" class="text-lg font-bold text-slate-900">Cadastrar Veterinário</h3>
-        <button onclick="closeVetModal()" class="text-slate-400 hover:text-slate-600 text-lg">
+        <button id="btn-close-modal-x" class="text-slate-400 hover:text-slate-600 text-lg">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
-      <form id="form-vet" onsubmit="saveVetForm(event)" class="space-y-4">
+      <form id="form-vet" class="space-y-4">
         <input type="hidden" id="vet-id">
         
         <div>
@@ -287,7 +287,7 @@
         </div>
 
         <div class="flex justify-end space-x-3 pt-3 border-t">
-          <button type="button" onclick="closeVetModal()" class="px-4 py-2 border rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50">Cancelar</button>
+          <button type="button" id="btn-close-modal-cancel" class="px-4 py-2 border rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50">Cancelar</button>
           <button type="submit" class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium shadow-sm">Salvar Registro</button>
         </div>
       </form>
@@ -300,9 +300,8 @@
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc, collection, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // CONFIGURAÇÃO DO PROJETO OFICIAL FIREBASE DO HOVET
+    // CONFIGURAÇÃO EXTRAÍDA DO SEU PROJETO NO FIREBASE CONSOLE
     const firebaseConfig = {
-      apiKey: "AIzaSyD5mImW9kE7KAiaO9vAB9A-A5nxcjcBffs",
       authDomain: "ponto-eletronico-hovet.firebaseapp.com",
       projectId: "ponto-eletronico-hovet",
       storageBucket: "ponto-eletronico-hovet.appspot.com",
@@ -315,22 +314,9 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // BIND GLOBAL PARA O NAVEGADOR E FUNÇÕES AUXILIARES
-    window.firebaseAuth = auth;
-    window.firebaseDb = db;
-    window.doc = doc;
-    window.getDoc = getDoc;
-    window.getDocs = getDocs;
-    window.updateDoc = updateDoc;
-    window.deleteDoc = deleteDoc;
-    window.addDoc = addDoc;
-    window.collection = collection;
-    window.query = query;
-    window.where = where;
-
     let currentUser = null;
 
-    // ATUALIZAÇÃO DO RELÓGIO DA INTERFACE
+    // ATUALIZAÇÃO DO RELÓGIO
     setInterval(() => {
       const now = new Date();
       const clockEl = document.getElementById('clock-display');
@@ -339,7 +325,7 @@
       if (dateEl) dateEl.innerText = now.toLocaleDateString('pt-BR', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
     }, 1000);
 
-    // ESCUTAR MUDANÇAS DE SESSÃO DO FIREBASE AUTH
+    // ESCUTAR MUDANÇAS DE SESSÃO
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         await loadUserProfile(user);
@@ -356,7 +342,7 @@
       }
     });
 
-    // 1. CARREGAR PERFIL DO UTILIZADOR NA COLEÇÃO 'vets'
+    // CARREGAR PERFIL DA COLEÇÃO 'vets'
     async function loadUserProfile(user) {
       try {
         const vetDocRef = doc(db, 'vets', user.uid);
@@ -365,7 +351,6 @@
         if (vetDocSnap.exists()) {
           currentUser = { uid: user.uid, ...vetDocSnap.data() };
         } else {
-          // Fallback de busca por e-mail na coleção 'vets'
           const q = query(collection(db, 'vets'), where('email', '==', user.email));
           const querySnap = await getDocs(q);
 
@@ -388,7 +373,7 @@
       }
     }
 
-    // ATUALIZA INTERFACE DE ACORDO COM O NIVEL DE ACESSO
+    // ATUALIZA INTERFACE
     function updateUIForUser() {
       if (!currentUser) return;
 
@@ -405,7 +390,7 @@
       }
     }
 
-    // FORMULÁRIO DE LOGIN
+    // LOGIN E LOGOUT
     document.getElementById('form-login').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('login-email').value;
@@ -418,13 +403,10 @@
       }
     });
 
-    // BOTÃO DE LOGOUT
-    document.getElementById('btn-logout').addEventListener('click', () => {
-      signOut(auth);
-    });
+    document.getElementById('btn-logout').addEventListener('click', () => signOut(auth));
 
-    // NAVEGAÇÃO ENTRE ABAS
-    window.showScreen = function(screenId) {
+    // NAVEGAÇÃO
+    function showScreen(screenId) {
       hideAllScreens();
       const screen = document.getElementById(screenId);
       if (screen) screen.classList.remove('hidden');
@@ -434,7 +416,7 @@
       } else if (screenId === 'screen-report') {
         loadMyPunches();
       }
-    };
+    }
 
     function hideAllScreens() {
       ['screen-login', 'screen-punch', 'screen-report', 'screen-coord'].forEach(id => {
@@ -447,8 +429,8 @@
     document.getElementById('nav-btn-report').addEventListener('click', () => showScreen('screen-report'));
     document.getElementById('nav-btn-coord').addEventListener('click', () => showScreen('screen-coord'));
 
-    // 2. CARREGAR LISTA DE COLABORADORES DA COLEÇÃO 'vets'
-    window.loadVetsList = async function() {
+    // GESTÃO DE VETERINÁRIOS
+    async function loadVetsList() {
       const vetsTableBody = document.getElementById('vets-table-body');
       if (!vetsTableBody) return;
 
@@ -459,7 +441,7 @@
         vetsTableBody.innerHTML = '';
 
         if (querySnap.empty) {
-          vetsTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">Nenhum colaborador encontrado na coleção vets.</td></tr>';
+          vetsTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">Nenhum colaborador encontrado.</td></tr>';
           return;
         }
 
@@ -476,20 +458,28 @@
             <td class="p-3"><span class="px-2 py-1 rounded-full text-xs font-semibold ${data.accessLevel === 'Coordenação' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-700'}">${data.accessLevel || 'Colaborador'}</span></td>
             <td class="p-3"><span class="px-2 py-1 rounded-full text-xs font-semibold ${data.status === 'Ativo' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${data.status || 'Ativo'}</span></td>
             <td class="p-3 text-center space-x-2">
-              <button onclick="editVet('${id}')" class="text-teal-600 hover:text-teal-800 text-xs font-semibold">Editar</button>
-              <button onclick="deleteVet('${id}')" class="text-rose-600 hover:text-rose-800 text-xs font-semibold">Excluir</button>
+              <button data-edit-id="${id}" class="btn-edit-vet text-teal-600 hover:text-teal-800 text-xs font-semibold">Editar</button>
+              <button data-delete-id="${id}" class="btn-delete-vet text-rose-600 hover:text-rose-800 text-xs font-semibold">Excluir</button>
             </td>
           `;
           vetsTableBody.appendChild(row);
         });
+
+        document.querySelectorAll('.btn-edit-vet').forEach(btn => {
+          btn.addEventListener('click', (e) => editVet(e.target.getAttribute('data-edit-id')));
+        });
+
+        document.querySelectorAll('.btn-delete-vet').forEach(btn => {
+          btn.addEventListener('click', (e) => deleteVet(e.target.getAttribute('data-delete-id')));
+        });
+
       } catch (error) {
         console.error("Erro ao carregar lista da coleção vets:", error);
-        vetsTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-rose-500">Erro ao carregar lista de colaboradores.</td></tr>';
+        vetsTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-rose-500">Erro ao carregar lista.</td></tr>';
       }
-    };
+    }
 
-    // 3. SALVAR OU ATUALIZAR REGISTRO NA COLEÇÃO 'vets'
-    window.saveVetForm = async function(event) {
+    document.getElementById('form-vet').addEventListener('submit', async (event) => {
       event.preventDefault();
       const vetId = document.getElementById('vet-id').value;
 
@@ -510,43 +500,28 @@
         } else {
           vetData.createdAt = new Date().toISOString();
           await addDoc(collection(db, 'vets'), vetData);
-          alert('Veterinário cadastrado com sucesso na coleção vets!');
+          alert('Veterinário cadastrado com sucesso!');
         }
         closeVetModal();
         loadVetsList();
       } catch (error) {
-        console.error("Erro ao salvar na coleção vets:", error);
         alert("Falha ao salvar cadastro: " + error.message);
       }
-    };
+    });
 
-    // 4. EXCLUIR REGISTRO DA COLEÇÃO 'vets'
-    window.deleteVet = async function(docId) {
-      if (confirm("Tem certeza de que deseja remover este cadastro da coleção vets?")) {
+    async function deleteVet(docId) {
+      if (confirm("Tem certeza de que deseja remover este cadastro?")) {
         try {
           await deleteDoc(doc(db, 'vets', docId));
           alert("Cadastro removido com sucesso!");
           loadVetsList();
         } catch (error) {
-          console.error("Erro ao excluir da coleção vets:", error);
           alert("Erro ao excluir registro.");
         }
       }
-    };
+    }
 
-    // MODAL
-    window.openVetModal = function() {
-      document.getElementById('form-vet').reset();
-      document.getElementById('vet-id').value = '';
-      document.getElementById('modal-title').innerText = 'Cadastrar Veterinário';
-      document.getElementById('vet-modal').classList.remove('hidden');
-    };
-
-    window.closeVetModal = function() {
-      document.getElementById('vet-modal').classList.add('hidden');
-    };
-
-    window.editVet = async function(docId) {
+    async function editVet(docId) {
       try {
         const snap = await getDoc(doc(db, 'vets', docId));
         if (snap.exists()) {
@@ -562,12 +537,27 @@
           document.getElementById('vet-modal').classList.remove('hidden');
         }
       } catch (err) {
-        alert("Erro ao carregar dados para edição: " + err.message);
+        alert("Erro ao carregar dados: " + err.message);
       }
-    };
+    }
 
-    // 5. REGISTRAR PONTO
-    window.registerPunch = async function(type) {
+    // MODAL
+    document.getElementById('btn-open-modal').addEventListener('click', () => {
+      document.getElementById('form-vet').reset();
+      document.getElementById('vet-id').value = '';
+      document.getElementById('modal-title').innerText = 'Cadastrar Veterinário';
+      document.getElementById('vet-modal').classList.remove('hidden');
+    });
+
+    function closeVetModal() {
+      document.getElementById('vet-modal').classList.add('hidden');
+    }
+
+    document.getElementById('btn-close-modal-x').addEventListener('click', closeVetModal);
+    document.getElementById('btn-close-modal-cancel').addEventListener('click', closeVetModal);
+
+    // REGISTRO DE PONTO
+    async function registerPunch(type) {
       if (!currentUser) return;
 
       if (navigator.geolocation) {
@@ -579,7 +569,7 @@
       } else {
         await savePunch(type, null, null);
       }
-    };
+    }
 
     async function savePunch(type, lat, lng) {
       try {
@@ -598,7 +588,14 @@
       }
     }
 
-    // CARREGAR HISTÓRICO
+    document.getElementById('btn-punch-entrada').addEventListener('click', () => registerPunch('Entrada'));
+    document.getElementById('btn-punch-almoco-saida').addEventListener('click', () => registerPunch('Saída Almoço'));
+    document.getElementById('btn-punch-almoco-retorno').addEventListener('click', () => registerPunch('Retorno Almoço'));
+    document.getElementById('btn-punch-saida').addEventListener('click', () => registerPunch('Saída'));
+    document.getElementById('btn-punch-plantao-entrada').addEventListener('click', () => registerPunch('Entrada Plantão'));
+    document.getElementById('btn-punch-plantao-saida').addEventListener('click', () => registerPunch('Saída Plantão'));
+
+    // HISTÓRICO
     async function loadMyPunches() {
       const listEl = document.getElementById('my-punches-list');
       if (!listEl || !currentUser) return;
@@ -611,7 +608,7 @@
         listEl.innerHTML = '';
 
         if (snap.empty) {
-          listEl.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-400">Nenhum registro de ponto efetuado até o momento.</td></tr>';
+          listEl.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-400">Nenhum registro de ponto encontrado.</td></tr>';
           return;
         }
 
