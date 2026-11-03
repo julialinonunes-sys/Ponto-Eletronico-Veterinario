@@ -536,7 +536,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, getDoc, doc, updateDoc, deleteDoc, query, where, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD5mImW9kE7KAiaO9vAB9A-A5nxcjcBffs",
@@ -560,6 +560,7 @@
         window.collection = collection;
         window.addDoc = addDoc;
         window.getDocs = getDocs;
+        window.getDoc = getDoc;
         window.doc = doc;
         window.updateDoc = updateDoc;
         window.deleteDoc = deleteDoc;
@@ -589,19 +590,42 @@
             const monthInput = document.getElementById('coordFilterMonth');
             if(monthInput) monthInput.value = yearMonth;
 
+            // AUTENTICAÇÃO COM COMPATIBILIDADE MELHORADA E BUSCA EM MINÚSCULAS
             window.onAuthStateChanged(window.firebaseAuth, async (user) => {
                 if (user) {
                     try {
-                        const q = window.query(window.collection(window.firebaseDb, 'users'), window.where('email', '==', user.email));
-                        const snapshot = await window.getDocs(q);
+                        const userEmail = (user.email || '').toLowerCase().trim();
+                        
+                        // 1. Tenta buscar pelo e-mail em minúsculas
+                        const q = window.query(
+                            window.collection(window.firebaseDb, 'users'), 
+                            window.where('email', '==', userEmail)
+                        );
+                        
+                        let snapshot = await window.getDocs(q);
+
+                        // 2. Se não encontrar por e-mail, busca pelo ID do documento (UID)
+                        if (snapshot.empty) {
+                            const docRef = window.doc(window.firebaseDb, 'users', user.uid);
+                            const docSnap = await window.getDoc(docRef);
+                            if (docSnap.exists()) {
+                                snapshot = { empty: false, docs: [docSnap] };
+                            }
+                        }
+
                         if (!snapshot.empty) {
                             const docData = snapshot.docs[0].data();
-                            currentUser = { id: snapshot.docs[0].id, uid: user.uid, name: docData.name || docData.userName || user.email, ...docData };
+                            currentUser = { 
+                                id: snapshot.docs[0].id, 
+                                uid: user.uid, 
+                                name: docData.name || docData.userName || user.email, 
+                                ...docData 
+                            };
                         } else {
                             currentUser = { uid: user.uid, email: user.email, name: user.displayName || user.email, role: "Colaborador", accessLevel: "Colaborador" };
                         }
                     } catch (e) {
-                        console.error("Erro ao carregar usuário:", e);
+                        console.error("Erro ao carregar perfil do usuário:", e);
                         currentUser = { uid: user.uid, email: user.email, name: user.email, role: "Colaborador", accessLevel: "Colaborador" };
                     }
                     initAuthenticatedUser();
@@ -1074,27 +1098,39 @@
             const name = document.getElementById('vetFormName').value.trim();
             const role = document.getElementById('vetFormRole').value;
             const accessLevel = document.getElementById('vetFormAccessLevel').value;
-            const email = document.getElementById('vetFormEmail').value.trim();
+            const email = document.getElementById('vetFormEmail').value.trim().toLowerCase();
             const password = document.getElementById('vetFormPassword').value;
             const status = document.getElementById('vetFormStatus').value;
 
             try {
                 if (docId) {
                     const docRef = window.doc(window.firebaseDb, 'users', docId);
-                    await window.updateDoc(docRef, { name, role, accessLevel, email, status });
+                    await window.updateDoc(docRef, { 
+                        name: name,
+                        userName: name, 
+                        role: role, 
+                        vetRole: role,
+                        accessLevel: accessLevel, 
+                        email: email, 
+                        status: status 
+                    });
                     showToast("Cadastro atualizado com sucesso!");
                 } else {
-                    await window.addDoc(window.collection(window.firebaseDb, 'users'), { name, role, accessLevel, email, status });
-                    try {
-                        await window.createUserWithEmailAndPassword(window.firebaseAuth, email, password);
-                    } catch (authErr) {
-                        console.log("Aviso Auth:", authErr);
-                    }
-                    showToast("Profissional cadastrado com sucesso!");
+                    await window.addDoc(window.collection(window.firebaseDb, 'users'), { 
+                        name: name,
+                        userName: name,
+                        role: role, 
+                        vetRole: role,
+                        accessLevel: accessLevel, 
+                        email: email, 
+                        status: status,
+                        createdAt: new Date().toISOString()
+                    });
+                    showToast("Profissional cadastrado no banco de dados!");
                 }
                 resetVetForm();
             } catch (error) {
-                console.error("Erro ao salvar profissional:", error);
+                console.error("Erro ao salvar no Firestore:", error);
                 showToast("Erro ao salvar dados no Firebase.", "warning");
             }
         }
