@@ -22,7 +22,7 @@
         </div>
       </div>
 
-      <!-- ÁREA DE AUTENTICAÇÃO / PERFIL -->
+      <!-- PAINEL DO UTILIZADOR -->
       <div id="user-header-info" class="hidden flex items-center space-x-4">
         <div class="text-right hidden sm:block">
           <p id="header-user-email" class="text-sm font-semibold text-slate-200"></p>
@@ -71,7 +71,7 @@
           <label class="block text-xs font-semibold uppercase text-slate-600 mb-2">E-mail Institucional</label>
           <div class="relative">
             <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-slate-400"></i>
-            <input type="email" id="login-email" required placeholder="seu.email@ufmt.br" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm outline-none transition-all">
+            <input type="email" id="login-email" required placeholder="seu.email@ufmt.br" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-500 text-sm outline-none">
           </div>
         </div>
 
@@ -79,7 +79,7 @@
           <label class="block text-xs font-semibold uppercase text-slate-600 mb-2">Palavra-passe / Senha</label>
           <div class="relative">
             <i class="fa-solid fa-key absolute left-3.5 top-3.5 text-slate-400"></i>
-            <input type="password" id="login-password" required placeholder="••••••••" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm outline-none transition-all">
+            <input type="password" id="login-password" required placeholder="••••••••" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-500 text-sm outline-none">
           </div>
         </div>
 
@@ -95,7 +95,7 @@
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div>
           <h2 class="text-xl font-bold text-slate-900">Registrar Frequência Individual</h2>
-          <p class="text-sm text-slate-500">A hora exata e a localização GPS serão anexadas ao seu registro.</p>
+          <p class="text-sm text-slate-500">Selecione o tipo de ponto abaixo. A hora exata e a localização serão anexadas ao seu registro.</p>
         </div>
         <div class="text-center sm:text-right bg-slate-50 px-4 py-2 rounded-lg border border-slate-200">
           <div id="clock-display" class="text-2xl font-mono font-bold text-slate-800">--:--:--</div>
@@ -103,9 +103,9 @@
         </div>
       </div>
 
-      <!-- BOTÕES DE BATE-PONTO -->
+      <!-- BOTÕES COLORIDOS DE REGISTRO -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <button id="btn-punch-entrada" class="bg-emerald-600 hover:bg-emerald-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+        <button id="btn-punch-entrada" class="bg-emerald-500 hover:bg-emerald-600 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
           <div class="flex justify-between items-center w-full">
             <span class="text-xs uppercase tracking-wider font-bold opacity-80">Início</span>
             <i class="fa-solid fa-right-to-bracket text-2xl"></i>
@@ -116,7 +116,7 @@
           </div>
         </button>
 
-        <button id="btn-punch-almoco-saida" class="bg-amber-600 hover:bg-amber-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+        <button id="btn-punch-almoco-saida" class="bg-amber-500 hover:bg-amber-600 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
           <div class="flex justify-between items-center w-full">
             <span class="text-xs uppercase tracking-wider font-bold opacity-80">Intervalo</span>
             <i class="fa-solid fa-utensils text-2xl"></i>
@@ -127,7 +127,7 @@
           </div>
         </button>
 
-        <button id="btn-punch-almoco-retorno" class="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+        <button id="btn-punch-almoco-retorno" class="bg-blue-500 hover:bg-blue-600 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
           <div class="flex justify-between items-center w-full">
             <span class="text-xs uppercase tracking-wider font-bold opacity-80">Retorno</span>
             <i class="fa-solid fa-rotate-left text-2xl"></i>
@@ -138,7 +138,7 @@
           </div>
         </button>
 
-        <button id="btn-punch-saida" class="bg-rose-600 hover:bg-rose-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+        <button id="btn-punch-saida" class="bg-rose-500 hover:bg-rose-600 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
           <div class="flex justify-between items-center w-full">
             <span class="text-xs uppercase tracking-wider font-bold opacity-80">Fim</span>
             <i class="fa-solid fa-right-from-bracket text-2xl"></i>
@@ -173,16 +173,14 @@
       </div>
     </section>
 
-    <!-- TELA DE MEU RELATÓRIO MENSAL -->
+    <!-- TELA MEU RELATÓRIO MENSAL -->
     <section id="screen-report" class="hidden space-y-6">
       <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
         <h2 class="text-xl font-bold text-slate-900 mb-4">Meu Histórico de Frequência</h2>
-        <p class="text-sm text-slate-500 mb-6">Listagem completa dos registros efetuados nesta conta.</p>
-
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="bg-slate-50 border-b border-slate-200 text-xs font-bold uppercase text-slate-600">
+              <tr class="bg-slate-50 border-b text-xs font-bold uppercase text-slate-600">
                 <th class="p-3">Data / Hora</th>
                 <th class="p-3">Tipo de Ponto</th>
                 <th class="p-3">Localização GPS</th>
@@ -198,36 +196,32 @@
 
     <!-- PAINEL DA COORDENAÇÃO -->
     <section id="screen-coord" class="hidden space-y-6">
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center">
         <div>
           <h2 class="text-xl font-bold text-slate-900">Painel de Gestão da Coordenação</h2>
-          <p class="text-sm text-slate-500">Gerenciamento de médicos veterinários e controle de pontos.</p>
+          <p class="text-sm text-slate-500">Gerenciamento da coleção <code class="bg-slate-100 px-1 py-0.5 rounded text-teal-700">vets</code></p>
         </div>
-        <button id="btn-open-modal" class="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2.5 rounded-lg shadow-sm flex items-center space-x-2 text-sm transition-colors">
+        <button id="btn-open-modal" class="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2.5 rounded-lg shadow-sm flex items-center space-x-2 text-sm">
           <i class="fa-solid fa-user-plus"></i>
           <span>Novo Veterinário</span>
         </button>
       </div>
 
-      <!-- TABELA DE VETERINÁRIOS CADASTRADOS -->
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
-          <h3 class="font-bold text-slate-800 text-sm uppercase">Colaboradores Cadastrados (`vets`)</h3>
-        </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="bg-slate-100/50 border-b border-slate-200 text-xs font-bold uppercase text-slate-600">
+              <tr class="bg-slate-100/50 border-b text-xs font-bold uppercase text-slate-600">
                 <th class="p-3">Nome</th>
                 <th class="p-3">E-mail</th>
-                <th class="p-3">Cargo / Função</th>
-                <th class="p-3">Nível de Acesso</th>
+                <th class="p-3">Cargo</th>
+                <th class="p-3">Nível</th>
                 <th class="p-3">Status</th>
                 <th class="p-3 text-center">Ações</th>
               </tr>
             </thead>
             <tbody id="vets-table-body" class="divide-y divide-slate-100 text-sm">
-              <tr><td colspan="6" class="p-4 text-center text-slate-400">A carregar lista de veterinários...</td></tr>
+              <tr><td colspan="6" class="p-4 text-center text-slate-400">A carregar colaboradores...</td></tr>
             </tbody>
           </table>
         </div>
@@ -236,7 +230,7 @@
 
   </main>
 
-  <!-- MODAL DE EDICAO/CADASTRO DE VETERINARIO -->
+  <!-- MODAL DE CADASTRO/EDIÇÃO -->
   <div id="vet-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 border border-slate-200">
       <div class="flex justify-between items-center border-b pb-3">
@@ -248,60 +242,54 @@
 
       <form id="form-vet" class="space-y-4">
         <input type="hidden" id="vet-id">
-        
         <div>
           <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nome Completo</label>
-          <input type="text" id="vet-name" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500">
+          <input type="text" id="vet-name" required class="w-full p-2.5 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500">
         </div>
-
         <div>
           <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nome de Utilizador</label>
-          <input type="text" id="vet-username" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500">
+          <input type="text" id="vet-username" required class="w-full p-2.5 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500">
         </div>
-
         <div>
-          <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">E-mail Institucional</label>
-          <input type="email" id="vet-email" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500">
+          <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">E-mail</label>
+          <input type="email" id="vet-email" required class="w-full p-2.5 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500">
         </div>
-
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Cargo / Função</label>
-            <input type="text" id="vet-role" required placeholder="Médico Veterinário" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500">
+            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Cargo</label>
+            <input type="text" id="vet-role" required placeholder="Médico Veterinário" class="w-full p-2.5 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500">
           </div>
           <div>
             <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nível de Acesso</label>
-            <select id="vet-access" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500 bg-white">
+            <select id="vet-access" class="w-full p-2.5 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500 bg-white">
               <option value="Colaborador">Colaborador</option>
               <option value="Coordenação">Coordenação</option>
             </select>
           </div>
         </div>
-
         <div>
-          <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Status do Perfil</label>
-          <select id="vet-status" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500 bg-white">
+          <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Status</label>
+          <select id="vet-status" class="w-full p-2.5 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500 bg-white">
             <option value="Ativo">Ativo</option>
             <option value="Inativo">Inativo</option>
           </select>
         </div>
-
         <div class="flex justify-end space-x-3 pt-3 border-t">
           <button type="button" id="btn-close-modal-cancel" class="px-4 py-2 border rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50">Cancelar</button>
-          <button type="submit" class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium shadow-sm">Salvar Registro</button>
+          <button type="submit" class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium shadow-sm">Salvar</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- SCRIPT INTEGRADO COM O FIREBASE -->
+  <!-- SCRIPT COM A SUA API KEY INTEGRADA -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc, collection, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // CONFIGURAÇÃO EXTRAÍDA DO SEU PROJETO NO FIREBASE CONSOLE
     const firebaseConfig = {
+      apiKey: "AIzaSyD5mImW9kE7KAiaO9vAB9A-A5nxcjcBffs",
       authDomain: "ponto-eletronico-hovet.firebaseapp.com",
       projectId: "ponto-eletronico-hovet",
       storageBucket: "ponto-eletronico-hovet.appspot.com",
@@ -309,14 +297,13 @@
       appId: "1:291977256870:web:NDIkNjg2YjltYTA4NDhjLTg2MTM2M2UxM2UxNTRh"
     };
 
-    // INICIALIZAÇÃO
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
     let currentUser = null;
 
-    // ATUALIZAÇÃO DO RELÓGIO
+    // RELÓGIO DA INTERFACE
     setInterval(() => {
       const now = new Date();
       const clockEl = document.getElementById('clock-display');
@@ -325,7 +312,7 @@
       if (dateEl) dateEl.innerText = now.toLocaleDateString('pt-BR', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
     }, 1000);
 
-    // ESCUTAR MUDANÇAS DE SESSÃO
+    // CONTROLE DE SESSÃO
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         await loadUserProfile(user);
@@ -342,7 +329,7 @@
       }
     });
 
-    // CARREGAR PERFIL DA COLEÇÃO 'vets'
+    // CARREGAR DADOS DO PERFIL DA COLEÇÃO 'vets'
     async function loadUserProfile(user) {
       try {
         const vetDocRef = doc(db, 'vets', user.uid);
@@ -369,11 +356,10 @@
         }
         updateUIForUser();
       } catch (error) {
-        console.error("Erro ao carregar perfil da coleção vets:", error);
+        console.error("Erro ao carregar perfil na coleção vets:", error);
       }
     }
 
-    // ATUALIZA INTERFACE
     function updateUIForUser() {
       if (!currentUser) return;
 
@@ -390,7 +376,7 @@
       }
     }
 
-    // LOGIN E LOGOUT
+    // FORMULÁRIO DE LOGIN
     document.getElementById('form-login').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('login-email').value;
@@ -405,7 +391,7 @@
 
     document.getElementById('btn-logout').addEventListener('click', () => signOut(auth));
 
-    // NAVEGAÇÃO
+    // NAVEGAÇÃO DE TELAS
     function showScreen(screenId) {
       hideAllScreens();
       const screen = document.getElementById(screenId);
@@ -429,19 +415,19 @@
     document.getElementById('nav-btn-report').addEventListener('click', () => showScreen('screen-report'));
     document.getElementById('nav-btn-coord').addEventListener('click', () => showScreen('screen-coord'));
 
-    // GESTÃO DE VETERINÁRIOS
+    // GESTÃO DA COLEÇÃO 'vets'
     async function loadVetsList() {
       const vetsTableBody = document.getElementById('vets-table-body');
       if (!vetsTableBody) return;
 
-      vetsTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">A carregar registros da coleção vets...</td></tr>';
+      vetsTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">A carregar lista da coleção vets...</td></tr>';
 
       try {
         const querySnap = await getDocs(collection(db, 'vets'));
         vetsTableBody.innerHTML = '';
 
         if (querySnap.empty) {
-          vetsTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">Nenhum colaborador encontrado.</td></tr>';
+          vetsTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">Nenhum colaborador encontrado na coleção vets.</td></tr>';
           return;
         }
 
@@ -608,7 +594,7 @@
         listEl.innerHTML = '';
 
         if (snap.empty) {
-          listEl.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-400">Nenhum registro de ponto encontrado.</td></tr>';
+          listEl.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-400">Nenhum registro encontrado.</td></tr>';
           return;
         }
 
