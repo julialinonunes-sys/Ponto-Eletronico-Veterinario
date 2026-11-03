@@ -67,7 +67,7 @@
         <i class="fa-solid fa-location-dot text-emerald-600 text-lg"></i>
         <div>
           <span class="font-bold">LOCALIZAÇÃO PARA REGISTRO</span>
-          <p id="location-display" class="text-xs text-emerald-700">Localização capturada: Lat -11.863600, Lng -55.497400</p>
+          <p id="location-display" class="text-xs text-emerald-700">Capturando coordenadas GPS...</p>
         </div>
       </div>
 
@@ -163,22 +163,23 @@
                 <th class="p-3">Data / Hora</th>
                 <th class="p-3">Tipo de Ponto</th>
                 <th class="p-3">Localização GPS</th>
+                <th class="p-3">Justificativa</th>
               </tr>
             </thead>
             <tbody id="my-punches-list" class="divide-y divide-slate-100 text-sm">
-              <tr><td colspan="3" class="p-4 text-center text-slate-400">Nenhum registro encontrado.</td></tr>
+              <tr><td colspan="4" class="p-4 text-center text-slate-400">Nenhum registro encontrado.</td></tr>
             </tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- PAINEL DA COORDENAÇÃO -->
+    <!-- PAINEL DA COORDENAÇÃO COM FILTROS E BANCO DE HORAS -->
     <section id="screen-coord" class="hidden space-y-6">
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center">
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h2 class="text-xl font-bold text-slate-900">Painel de Gestão da Coordenação</h2>
-          <p class="text-sm text-slate-500">Gerenciamento da coleção <code class="bg-slate-100 px-1 py-0.5 rounded text-teal-700">vets</code></p>
+          <p class="text-sm text-slate-500">Acompanhamento de registros e banco de horas da equipe</p>
         </div>
         <button id="btn-open-modal" class="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2.5 rounded-lg shadow-sm flex items-center space-x-2 text-sm">
           <i class="fa-solid fa-user-plus"></i>
@@ -186,7 +187,94 @@
         </button>
       </div>
 
+      <!-- ÁREA DE FILTROS E RELATÓRIO MENSAL -->
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-6">
+        <div class="border-b border-slate-200 pb-4">
+          <h3 class="font-bold text-slate-800 text-base flex items-center space-x-2">
+            <i class="fa-solid fa-filter text-hovet-blue"></i>
+            <span>Relatório e Banco de Horas Por Colaborador</span>
+          </h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Colaborador</label>
+            <select id="filter-vet" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-white outline-none focus:ring-2 focus:ring-hovet-blue">
+              <option value="">Selecione um veterinário...</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Mês</label>
+            <select id="filter-month" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-white outline-none focus:ring-2 focus:ring-hovet-blue">
+              <option value="0">Janeiro</option>
+              <option value="1">Fevereiro</option>
+              <option value="2">Março</option>
+              <option value="3">Abril</option>
+              <option value="4">Maio</option>
+              <option value="5">Junho</option>
+              <option value="6">Julho</option>
+              <option value="7">Agosto</option>
+              <option value="8">Setembro</option>
+              <option value="9">Outubro</option>
+              <option value="10">Novembro</option>
+              <option value="11">Dezembro</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Ano</label>
+            <input type="number" id="filter-year" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-white outline-none focus:ring-2 focus:ring-hovet-blue">
+          </div>
+
+          <div>
+            <button id="btn-apply-filter" class="w-full bg-hovet-blue hover:bg-opacity-90 text-white font-bold py-2.5 rounded-lg shadow transition-colors flex items-center justify-center space-x-2 text-sm">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <span>Filtrar Relatório</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- CARTÃO DE TOTALIZADOR DE HORAS -->
+        <div id="total-hours-card" class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div class="flex items-center space-x-3">
+            <div class="bg-hovet-blue text-white p-3 rounded-xl">
+              <i class="fa-solid fa-clock text-2xl"></i>
+            </div>
+            <div>
+              <p class="text-xs font-bold uppercase text-slate-500">Horas Totais Trabalhadas no Mês</p>
+              <p id="selected-vet-name" class="text-sm font-semibold text-slate-800">Selecione um colaborador para calcular</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <span id="calculated-total-hours" class="text-3xl font-mono font-bold text-hovet-blue">00h 00m</span>
+          </div>
+        </div>
+
+        <!-- TABELA DE REGISTROS DO COLABORADOR -->
+        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-100 border-b text-xs font-bold uppercase text-slate-600">
+                <th class="p-3">Data / Hora</th>
+                <th class="p-3">Tipo de Ponto</th>
+                <th class="p-3">Localização GPS</th>
+                <th class="p-3">Justificativa / Observação</th>
+                <th class="p-3 text-center">Ação</th>
+              </tr>
+            </thead>
+            <tbody id="filtered-punches-body" class="divide-y divide-slate-100 text-sm">
+              <tr><td colspan="5" class="p-4 text-center text-slate-400">Selecione um colaborador e clique em Filtrar para carregar os pontos.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TABELA DE COLABORADORES CADASTRADOS -->
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+          <h3 class="font-bold text-slate-800 text-sm uppercase">Colaboradores Cadastrados (`vets`)</h3>
+        </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
@@ -209,11 +297,9 @@
 
   </main>
 
-  <!-- MODAL DE LOGIN (FLUTUANTE, EXATAMENTE COMO NA SUA FOTO) -->
+  <!-- MODAL DE LOGIN FLUTUANTE -->
   <div id="screen-login" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200">
-      
-      <!-- TOPO AZUL PETRÓLEO DO MODAL DE LOGIN -->
       <div class="bg-hovet-blue text-white p-8 text-center flex flex-col items-center">
         <div class="bg-white/10 border border-white/20 rounded-2xl p-3.5 mb-3">
           <i class="fa-solid fa-user-doctor text-3xl text-white"></i>
@@ -222,7 +308,6 @@
         <p class="text-xs text-blue-100 mt-1">Universidade Federal de Mato Grosso, campus Sinop</p>
       </div>
 
-      <!-- CORPO DO FORMULÁRIO -->
       <div class="p-8">
         <h3 class="text-xs font-bold uppercase tracking-wider text-center text-slate-400 mb-6">Acesso ao Sistema de Ponto</h3>
 
@@ -231,7 +316,7 @@
             <label class="block text-xs font-bold uppercase text-slate-500 mb-1">E-mail Institucional</label>
             <div class="relative">
               <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-slate-400"></i>
-              <input type="email" id="login-email" required placeholder="seu.email@ufmt.br" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-hovet-blue focus:border-hovet-blue transition-all">
+              <input type="email" id="login-email" required placeholder="seu.email@ufmt.br" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-hovet-blue">
             </div>
           </div>
 
@@ -239,7 +324,7 @@
             <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Senha de Acesso</label>
             <div class="relative">
               <i class="fa-solid fa-lock absolute left-3.5 top-3.5 text-slate-400"></i>
-              <input type="password" id="login-password" required placeholder="••••••••" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-hovet-blue focus:border-hovet-blue transition-all">
+              <input type="password" id="login-password" required placeholder="••••••••" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-hovet-blue">
             </div>
           </div>
 
@@ -253,7 +338,6 @@
           <p class="text-xs text-slate-400">Dúvidas ou problemas de acesso? Procure a Coordenação do HOVET.</p>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -309,7 +393,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT FIREBASE -->
+  <!-- SCRIPT FIREBASE COMPLETO -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -329,14 +413,20 @@
     const db = getFirestore(app);
 
     let currentUser = null;
+    let allVetsList = [];
+
+    // DATA ATUAL NOS FILTROS
+    const now = new Date();
+    document.getElementById('filter-month').value = now.getMonth();
+    document.getElementById('filter-year').value = now.getFullYear();
 
     // RELÓGIO DA INTERFACE
     setInterval(() => {
-      const now = new Date();
+      const current = new Date();
       const clockEl = document.getElementById('clock-display');
       const dateEl = document.getElementById('date-display');
-      if (clockEl) clockEl.innerText = now.toLocaleTimeString('pt-BR');
-      if (dateEl) dateEl.innerText = now.toLocaleDateString('pt-BR', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+      if (clockEl) clockEl.innerText = current.toLocaleTimeString('pt-BR');
+      if (dateEl) dateEl.innerText = current.toLocaleDateString('pt-BR', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
     }, 1000);
 
     // CONTROLE DE SESSÃO
@@ -383,7 +473,7 @@
         }
         updateUIForUser();
       } catch (error) {
-        console.error("Erro ao carregar perfil na coleção vets:", error);
+        console.error("Erro ao carregar perfil:", error);
       }
     }
 
@@ -442,9 +532,10 @@
     document.getElementById('nav-btn-report').addEventListener('click', () => showScreen('screen-report'));
     document.getElementById('nav-btn-coord').addEventListener('click', () => showScreen('screen-coord'));
 
-    // GESTÃO DA COLEÇÃO 'vets'
+    // GESTÃO DA COLEÇÃO 'vets' E PREENCHIMENTO DO SELECT DE FILTRO
     async function loadVetsList() {
       const vetsTableBody = document.getElementById('vets-table-body');
+      const filterSelect = document.getElementById('filter-vet');
       if (!vetsTableBody) return;
 
       vetsTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">A carregar lista da coleção vets...</td></tr>';
@@ -452,16 +543,26 @@
       try {
         const querySnap = await getDocs(collection(db, 'vets'));
         vetsTableBody.innerHTML = '';
+        filterSelect.innerHTML = '<option value="">Selecione um veterinário...</option>';
+        allVetsList = [];
 
         if (querySnap.empty) {
-          vetsTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">Nenhum colaborador encontrado na coleção vets.</td></tr>';
+          vetsTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">Nenhum colaborador encontrado.</td></tr>';
           return;
         }
 
         querySnap.forEach((docSnap) => {
           const data = docSnap.data();
           const id = docSnap.id;
+          allVetsList.push({ id, ...data });
 
+          // Opção para o filtro
+          const opt = document.createElement('option');
+          opt.value = id;
+          opt.innerText = `${data.name || data.userName || data.email} (${data.role || 'Veterinário'})`;
+          filterSelect.appendChild(opt);
+
+          // Linha da tabela
           const row = document.createElement('tr');
           row.className = "hover:bg-slate-50 border-b border-slate-100";
           row.innerHTML = `
@@ -487,11 +588,124 @@
         });
 
       } catch (error) {
-        console.error("Erro ao carregar lista da coleção vets:", error);
-        vetsTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-rose-500">Erro ao carregar lista.</td></tr>';
+        console.error("Erro ao carregar lista:", error);
       }
     }
 
+    // APLICAR FILTRO DE BANCO DE HORAS E PONTOS
+    document.getElementById('btn-apply-filter').addEventListener('click', async () => {
+      const vetId = document.getElementById('filter-vet').value;
+      const targetMonth = parseInt(document.getElementById('filter-month').value);
+      const targetYear = parseInt(document.getElementById('filter-year').value);
+      const tableBody = document.getElementById('filtered-punches-body');
+      const hoursDisplay = document.getElementById('calculated-total-hours');
+      const vetNameDisplay = document.getElementById('selected-vet-name');
+
+      if (!vetId) {
+        alert("Selecione um colaborador no filtro.");
+        return;
+      }
+
+      const selectedVet = allVetsList.find(v => v.id === vetId);
+      vetNameDisplay.innerText = selectedVet ? `${selectedVet.name || selectedVet.email} - Mês ${targetMonth + 1}/${targetYear}` : '';
+      tableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-400">A calcular horas e buscar registros...</td></tr>';
+
+      try {
+        const q = query(collection(db, 'punches'), where('userId', '==', vetId));
+        const snap = await getDocs(q);
+
+        if (snap.empty) {
+          tableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-400">Nenhum ponto registrado para este colaborador.</td></tr>';
+          hoursDisplay.innerText = "00h 00m";
+          return;
+        }
+
+        let filteredPunches = [];
+        snap.forEach(docSnap => {
+          const data = docSnap.data();
+          const pDate = new Date(data.timestamp);
+          if (pDate.getMonth() === targetMonth && pDate.getFullYear() === targetYear) {
+            filteredPunches.push({ id: docSnap.id, ...data, dateObj: pDate });
+          }
+        });
+
+        // Ordenar por data
+        filteredPunches.sort((a, b) => a.dateObj - b.dateObj);
+
+        tableBody.innerHTML = '';
+        if (filteredPunches.length === 0) {
+          tableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-400">Nenhum registro encontrado neste mês/ano.</td></tr>';
+          hoursDisplay.innerText = "00h 00m";
+          return;
+        }
+
+        // CÁLCULO DE HORAS TRABALHADAS
+        let totalMs = 0;
+        let lastInTime = null;
+
+        filteredPunches.forEach(p => {
+          const type = p.type || '';
+          if (type.includes('Entrada') || type.includes('Retorno')) {
+            lastInTime = p.dateObj;
+          } else if ((type.includes('Saída') || type.includes('Intervalo')) && lastInTime) {
+            totalMs += (p.dateObj - lastInTime);
+            lastInTime = null;
+          }
+
+          const dateFormatted = p.dateObj.toLocaleString('pt-BR');
+          const coords = (p.latitude && p.longitude) ? `${p.latitude.toFixed(4)}, ${p.longitude.toFixed(4)}` : 'Não capturado';
+
+          const row = document.createElement('tr');
+          row.className = "hover:bg-slate-50 border-b border-slate-100";
+          row.innerHTML = `
+            <td class="p-3 font-medium text-slate-800">${dateFormatted}</td>
+            <td class="p-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-hovet-blue border border-blue-200">${p.type}</span></td>
+            <td class="p-3 text-slate-500 text-xs">${coords}</td>
+            <td class="p-3 text-slate-600 italic text-xs">${p.justification || 'Sem observações'}</td>
+            <td class="p-3 text-center">
+              <button data-punch-id="${p.id}" class="btn-add-just text-teal-600 hover:text-teal-800 text-xs font-semibold">
+                <i class="fa-solid fa-pen-to-square"></i> Justificar
+              </button>
+            </td>
+          `;
+          tableBody.appendChild(row);
+        });
+
+        // CONVERTER MS PARA HORAS E MINUTOS
+        const totalMinutes = Math.floor(totalMs / (1000 * 60));
+        const hours = Math.floor(totalMinutes / 60);
+        const mins = totalMinutes % 60;
+        hoursDisplay.innerText = `${hours}h ${mins < 10 ? '0' : ''}${mins}m`;
+
+        // ADICIONAR JUSTIFICATIVA
+        document.querySelectorAll('.btn-add-just').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const punchId = e.target.closest('button').getAttribute('data-punch-id');
+            addJustification(punchId);
+          });
+        });
+
+      } catch (err) {
+        console.error("Erro ao filtrar registros:", err);
+        tableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-rose-500">Erro ao consultar histórico.</td></tr>';
+      }
+    });
+
+    // FUNÇÃO PARA ADICIONAR JUSTIFICATIVA EM UM PONTO
+    async function addJustification(punchId) {
+      const text = prompt("Digite a justificativa ou observação para este registro:");
+      if (text !== null) {
+        try {
+          await updateDoc(doc(db, 'punches', punchId), { justification: text });
+          alert("Justificativa salva com sucesso!");
+          document.getElementById('btn-apply-filter').click();
+        } catch (err) {
+          alert("Erro ao salvar justificativa: " + err.message);
+        }
+      }
+    }
+
+    // FORMULÁRIO E MODAIS
     document.getElementById('form-vet').addEventListener('submit', async (event) => {
       event.preventDefault();
       const vetId = document.getElementById('vet-id').value;
@@ -554,7 +768,6 @@
       }
     }
 
-    // MODAL VETS
     document.getElementById('btn-open-modal').addEventListener('click', () => {
       document.getElementById('form-vet').reset();
       document.getElementById('vet-id').value = '';
@@ -569,7 +782,7 @@
     document.getElementById('btn-close-modal-x').addEventListener('click', closeVetModal);
     document.getElementById('btn-close-modal-cancel').addEventListener('click', closeVetModal);
 
-    // REGISTRO DE PONTO
+    // REGISTRO DE PONTO E HISTÓRICO INDIVIDUAL
     async function registerPunch(type) {
       if (!currentUser) return;
 
@@ -593,7 +806,8 @@
           type: type,
           timestamp: new Date().toISOString(),
           latitude: lat,
-          longitude: lng
+          longitude: lng,
+          justification: ''
         });
         alert(`Ponto registrado com sucesso: ${type}`);
       } catch (err) {
@@ -608,12 +822,11 @@
     document.getElementById('btn-punch-plantao-entrada').addEventListener('click', () => registerPunch('Entrada Plantão'));
     document.getElementById('btn-punch-plantao-saida').addEventListener('click', () => registerPunch('Saída Plantão'));
 
-    // HISTÓRICO
     async function loadMyPunches() {
       const listEl = document.getElementById('my-punches-list');
       if (!listEl || !currentUser) return;
 
-      listEl.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-400">A carregar registros...</td></tr>';
+      listEl.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400">A carregar registros...</td></tr>';
 
       try {
         const q = query(collection(db, 'punches'), where('userId', '==', currentUser.uid));
@@ -621,7 +834,7 @@
         listEl.innerHTML = '';
 
         if (snap.empty) {
-          listEl.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-400">Nenhum registro encontrado.</td></tr>';
+          listEl.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400">Nenhum registro encontrado.</td></tr>';
           return;
         }
 
@@ -633,8 +846,9 @@
           const row = document.createElement('tr');
           row.innerHTML = `
             <td class="p-3 font-medium text-slate-800">${date}</td>
-            <td class="p-3 text-teal-600 font-semibold">${p.type}</td>
+            <td class="p-3 font-semibold text-hovet-blue">${p.type}</td>
             <td class="p-3 text-slate-500 text-xs">${coords}</td>
+            <td class="p-3 text-slate-600 text-xs italic">${p.justification || 'Nenhuma'}</td>
           `;
           listEl.appendChild(row);
         });
