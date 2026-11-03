@@ -1,118 +1,637 @@
-// 1. Carregar perfil do utilizador logado na coleção 'vets'
-async function loadUserProfile(user) {
-  try {
-    const vetDocRef = window.doc(window.firebaseDb, 'vets', user.uid);
-    const vetDocSnap = await window.getDoc(vetDocRef);
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ponto Eletrônico - HOVET UFMT</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 antialiased min-h-screen flex flex-col">
 
-    if (vetDocSnap.exists()) {
-      currentUser = { uid: user.uid, ...vetDocSnap.data() };
-    } else {
-      // Fallback de busca por e-mail caso o ID do documento seja diferente do UID
-      const q = window.query(
-        window.collection(window.firebaseDb, 'vets'),
-        window.where('email', '==', user.email)
-      );
-      const querySnap = await window.getDocs(q);
-      
-      if (!querySnap.empty) {
-        const docData = querySnap.docs[0];
-        currentUser = { uid: user.uid, docId: docData.id, ...docData.data() };
+  <!-- CABEÇALHO DA APLICAÇÃO -->
+  <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="bg-teal-600 p-2 rounded-lg">
+          <i class="fa-solid fa-notes-medical text-2xl text-white"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight">Hospital Veterinário - HOVET</h1>
+          <p class="text-xs text-slate-400">Universidade Federal de Mato Grosso, campus Sinop</p>
+        </div>
+      </div>
+
+      <!-- ÁREA DE AUTENTICAÇÃO / PERFIL -->
+      <div id="user-header-info" class="hidden flex items-center space-x-4">
+        <div class="text-right hidden sm:block">
+          <p id="header-user-email" class="text-sm font-semibold text-slate-200"></p>
+          <p id="header-user-role" class="text-xs text-teal-400 font-medium"></p>
+        </div>
+        <button id="btn-logout" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white p-2.5 rounded-lg transition-colors border border-slate-700" title="Sair do sistema">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- MENU DE NAVEGAÇÃO -->
+    <nav id="app-nav" class="hidden bg-slate-800 border-t border-slate-700/50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-2 py-2 overflow-x-auto">
+        <button id="nav-btn-punch" class="nav-tab bg-teal-600 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center space-x-2 transition-colors">
+          <i class="fa-solid fa-fingerprint"></i>
+          <span>Registrar Ponto</span>
+        </button>
+        <button id="nav-btn-report" class="nav-tab text-slate-300 hover:bg-slate-700 hover:text-white px-4 py-2 rounded-md text-sm font-medium flex items-center space-x-2 transition-colors">
+          <i class="fa-solid fa-file-invoice"></i>
+          <span>Meu Relatório Mensal</span>
+        </button>
+        <button id="nav-btn-coord" class="nav-tab hidden text-amber-400 hover:bg-slate-700 hover:text-amber-300 px-4 py-2 rounded-md text-sm font-medium flex items-center space-x-2 transition-colors border border-amber-500/30">
+          <i class="fa-solid fa-user-shield"></i>
+          <span>Painel da Coordenação</span>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- TELA DE LOGIN -->
+    <section id="screen-login" class="max-w-md mx-auto my-12 bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
+      <div class="text-center mb-8">
+        <div class="inline-flex bg-teal-50 p-4 rounded-full text-teal-600 mb-4">
+          <i class="fa-solid fa-lock text-3xl"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-slate-900">Acesso ao Sistema</h2>
+        <p class="text-sm text-slate-500 mt-1">Informe as suas credenciais para continuar</p>
+      </div>
+
+      <form id="form-login" class="space-y-5">
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-600 mb-2">E-mail Institucional</label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-slate-400"></i>
+            <input type="email" id="login-email" required placeholder="seu.email@ufmt.br" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm outline-none transition-all">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-600 mb-2">Palavra-passe / Senha</label>
+          <div class="relative">
+            <i class="fa-solid fa-key absolute left-3.5 top-3.5 text-slate-400"></i>
+            <input type="password" id="login-password" required placeholder="••••••••" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm outline-none transition-all">
+          </div>
+        </div>
+
+        <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 rounded-lg shadow-md transition-colors flex items-center justify-center space-x-2">
+          <span>Entrar no Sistema</span>
+          <i class="fa-solid fa-arrow-right text-sm"></i>
+        </button>
+      </form>
+    </section>
+
+    <!-- TELA DE REGISTRO DE PONTO -->
+    <section id="screen-punch" class="hidden space-y-6">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">Registrar Frequência Individual</h2>
+          <p class="text-sm text-slate-500">A hora exata e a localização GPS serão anexadas ao seu registro.</p>
+        </div>
+        <div class="text-center sm:text-right bg-slate-50 px-4 py-2 rounded-lg border border-slate-200">
+          <div id="clock-display" class="text-2xl font-mono font-bold text-slate-800">--:--:--</div>
+          <div id="date-display" class="text-xs font-semibold text-slate-500 uppercase">--/--/----</div>
+        </div>
+      </div>
+
+      <!-- BOTÕES DE BATE-PONTO -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <button onclick="registerPunch('Entrada')" class="bg-emerald-600 hover:bg-emerald-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+          <div class="flex justify-between items-center w-full">
+            <span class="text-xs uppercase tracking-wider font-bold opacity-80">Início</span>
+            <i class="fa-solid fa-right-to-bracket text-2xl"></i>
+          </div>
+          <div class="text-left">
+            <span class="text-lg font-bold block">Entrada</span>
+            <span class="text-xs opacity-80">Início da jornada regular</span>
+          </div>
+        </button>
+
+        <button onclick="registerPunch('Saída Almoço')" class="bg-amber-600 hover:bg-amber-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+          <div class="flex justify-between items-center w-full">
+            <span class="text-xs uppercase tracking-wider font-bold opacity-80">Intervalo</span>
+            <i class="fa-solid fa-utensils text-2xl"></i>
+          </div>
+          <div class="text-left">
+            <span class="text-lg font-bold block">Saída Almoço</span>
+            <span class="text-xs opacity-80">Pausa para refeição/descanso</span>
+          </div>
+        </button>
+
+        <button onclick="registerPunch('Retorno Almoço')" class="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+          <div class="flex justify-between items-center w-full">
+            <span class="text-xs uppercase tracking-wider font-bold opacity-80">Retorno</span>
+            <i class="fa-solid fa-rotate-left text-2xl"></i>
+          </div>
+          <div class="text-left">
+            <span class="text-lg font-bold block">Retorno Almoço</span>
+            <span class="text-xs opacity-80">Volta do intervalo</span>
+          </div>
+        </button>
+
+        <button onclick="registerPunch('Saída')" class="bg-rose-600 hover:bg-rose-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+          <div class="flex justify-between items-center w-full">
+            <span class="text-xs uppercase tracking-wider font-bold opacity-80">Fim</span>
+            <i class="fa-solid fa-right-from-bracket text-2xl"></i>
+          </div>
+          <div class="text-left">
+            <span class="text-lg font-bold block">Saída</span>
+            <span class="text-xs opacity-80">Encerramento do expediente</span>
+          </div>
+        </button>
+
+        <button onclick="registerPunch('Entrada Plantão')" class="bg-purple-600 hover:bg-purple-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+          <div class="flex justify-between items-center w-full">
+            <span class="text-xs uppercase tracking-wider font-bold opacity-80">Plantão</span>
+            <i class="fa-solid fa-user-clock text-2xl"></i>
+          </div>
+          <div class="text-left">
+            <span class="text-lg font-bold block">Entrada Plantão</span>
+            <span class="text-xs opacity-80">Início do turno de plantão</span>
+          </div>
+        </button>
+
+        <button onclick="registerPunch('Saída Plantão')" class="bg-indigo-600 hover:bg-indigo-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+          <div class="flex justify-between items-center w-full">
+            <span class="text-xs uppercase tracking-wider font-bold opacity-80">Plantão</span>
+            <i class="fa-solid fa-house-user text-2xl"></i>
+          </div>
+          <div class="text-left">
+            <span class="text-lg font-bold block">Saída Plantão</span>
+            <span class="text-xs opacity-80">Encerramento do plantão</span>
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <!-- TELA DE MEU RELATÓRIO MENSAL -->
+    <section id="screen-report" class="hidden space-y-6">
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <h2 class="text-xl font-bold text-slate-900 mb-4">Meu Histórico de Frequência</h2>
+        <p class="text-sm text-slate-500 mb-6">Listagem completa dos registros efetuados nesta conta.</p>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 text-xs font-bold uppercase text-slate-600">
+                <th class="p-3">Data / Hora</th>
+                <th class="p-3">Tipo de Ponto</th>
+                <th class="p-3">Localização GPS</th>
+              </tr>
+            </thead>
+            <tbody id="my-punches-list" class="divide-y divide-slate-100 text-sm">
+              <tr><td colspan="3" class="p-4 text-center text-slate-400">Nenhum registro encontrado.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAINEL DA COORDENAÇÃO -->
+    <section id="screen-coord" class="hidden space-y-6">
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">Painel de Gestão da Coordenação</h2>
+          <p class="text-sm text-slate-500">Gerenciamento de médicos veterinários e controle de pontos.</p>
+        </div>
+        <button onclick="openVetModal()" class="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2.5 rounded-lg shadow-sm flex items-center space-x-2 text-sm transition-colors">
+          <i class="fa-solid fa-user-plus"></i>
+          <span>Novo Veterinário</span>
+        </button>
+      </div>
+
+      <!-- TABELA DE VETERINÁRIOS CADASTRADOS -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+          <h3 class="font-bold text-slate-800 text-sm uppercase">Colaboradores Cadastrados (`vets`)</h3>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-100/50 border-b border-slate-200 text-xs font-bold uppercase text-slate-600">
+                <th class="p-3">Nome</th>
+                <th class="p-3">E-mail</th>
+                <th class="p-3">Cargo / Função</th>
+                <th class="p-3">Nível de Acesso</th>
+                <th class="p-3">Status</th>
+                <th class="p-3 text-center">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="vets-table-body" class="divide-y divide-slate-100 text-sm">
+              <tr><td colspan="6" class="p-4 text-center text-slate-400">A carregar lista de veterinários...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL DE EDICAO/CADASTRO DE VETERINARIO -->
+  <div id="vet-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 border border-slate-200">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 id="modal-title" class="text-lg font-bold text-slate-900">Cadastrar Veterinário</h3>
+        <button onclick="closeVetModal()" class="text-slate-400 hover:text-slate-600 text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="form-vet" onsubmit="saveVetForm(event)" class="space-y-4">
+        <input type="hidden" id="vet-id">
+        
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nome Completo</label>
+          <input type="text" id="vet-name" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nome de Utilizador</label>
+          <input type="text" id="vet-username" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">E-mail Institucional</label>
+          <input type="email" id="vet-email" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Cargo / Função</label>
+            <input type="text" id="vet-role" required placeholder="Médico Veterinário" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nível de Acesso</label>
+            <select id="vet-access" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500 bg-white">
+              <option value="Colaborador">Colaborador</option>
+              <option value="Coordenação">Coordenação</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Status do Perfil</label>
+          <select id="vet-status" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal-500 bg-white">
+            <option value="Ativo">Ativo</option>
+            <option value="Inativo">Inativo</option>
+          </select>
+        </div>
+
+        <div class="flex justify-end space-x-3 pt-3 border-t">
+          <button type="button" onclick="closeVetModal()" class="px-4 py-2 border rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium shadow-sm">Salvar Registro</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SCRIPT INTEGRADO COM O FIREBASE -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc, collection, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // CONFIGURAÇÃO DO PROJETO OFICIAL FIREBASE DO HOVET
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-EXEMPLO-SUA-API-KEY",
+      authDomain: "ponto-eletronico-hovet.firebaseapp.com",
+      projectId: "ponto-eletronico-hovet",
+      storageBucket: "ponto-eletronico-hovet.appspot.com",
+      messagingSenderId: "291977256870",
+      appId: "1:291977256870:web:NDIkNjg2YjltYTA4NDhjLTg2MTM2M2UxM2UxNTRh"
+    };
+
+    // INICIALIZAÇÃO
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // BIND GLOBAL PARA O NAVEGADOR E FUNÇÕES AUXILIARES
+    window.firebaseAuth = auth;
+    window.firebaseDb = db;
+    window.doc = doc;
+    window.getDoc = getDoc;
+    window.getDocs = getDocs;
+    window.updateDoc = updateDoc;
+    window.deleteDoc = deleteDoc;
+    window.addDoc = addDoc;
+    window.collection = collection;
+    window.query = query;
+    window.where = where;
+
+    let currentUser = null;
+
+    // ATUALIZAÇÃO DO RELÓGIO DA INTERFACE
+    setInterval(() => {
+      const now = new Date();
+      const clockEl = document.getElementById('clock-display');
+      const dateEl = document.getElementById('date-display');
+      if (clockEl) clockEl.innerText = now.toLocaleTimeString('pt-BR');
+      if (dateEl) dateEl.innerText = now.toLocaleDateString('pt-BR', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+    }, 1000);
+
+    // ESCUTAR MUDANÇAS DE SESSÃO DO FIREBASE AUTH
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        await loadUserProfile(user);
+        document.getElementById('screen-login').classList.add('hidden');
+        document.getElementById('user-header-info').classList.remove('hidden');
+        document.getElementById('app-nav').classList.remove('hidden');
+        showScreen('screen-punch');
       } else {
-        // Perfil padrão caso não encontre o documento
-        currentUser = {
-          uid: user.uid,
-          email: user.email,
-          name: user.email,
-          accessLevel: 'Colaborador',
-          role: 'Colaborador'
-        };
+        currentUser = null;
+        document.getElementById('screen-login').classList.remove('hidden');
+        document.getElementById('user-header-info').classList.add('hidden');
+        document.getElementById('app-nav').classList.add('hidden');
+        hideAllScreens();
+      }
+    });
+
+    // 1. CARREGAR PERFIL DO UTILIZADOR NA COLEÇÃO 'vets'
+    async function loadUserProfile(user) {
+      try {
+        const vetDocRef = doc(db, 'vets', user.uid);
+        const vetDocSnap = await getDoc(vetDocRef);
+
+        if (vetDocSnap.exists()) {
+          currentUser = { uid: user.uid, ...vetDocSnap.data() };
+        } else {
+          // Fallback de busca por e-mail na coleção 'vets'
+          const q = query(collection(db, 'vets'), where('email', '==', user.email));
+          const querySnap = await getDocs(q);
+
+          if (!querySnap.empty) {
+            const docData = querySnap.docs[0];
+            currentUser = { uid: user.uid, docId: docData.id, ...docData.data() };
+          } else {
+            currentUser = {
+              uid: user.uid,
+              email: user.email,
+              name: user.email,
+              accessLevel: 'Colaborador',
+              role: 'Colaborador'
+            };
+          }
+        }
+        updateUIForUser();
+      } catch (error) {
+        console.error("Erro ao carregar perfil da coleção vets:", error);
       }
     }
-    updateUIForUser();
-  } catch (error) {
-    console.error("Erro ao carregar perfil da coleção vets:", error);
-  }
-}
 
-// 2. Salvar ou atualizar cadastro de veterinário no Painel da Coordenação
-async function saveVetForm(event) {
-  event.preventDefault();
-  const vetId = document.getElementById('vet-id').value;
-  
-  const vetData = {
-    name: document.getElementById('vet-name').value,
-    userName: document.getElementById('vet-username').value,
-    email: document.getElementById('vet-email').value,
-    role: document.getElementById('vet-role').value,
-    accessLevel: document.getElementById('vet-access').value,
-    status: document.getElementById('vet-status').value,
-    updatedAt: new Date().toISOString()
-  };
+    // ATUALIZA INTERFACE DE ACORDO COM O NIVEL DE ACESSO
+    function updateUIForUser() {
+      if (!currentUser) return;
 
-  try {
-    if (vetId) {
-      // Atualizar existente na coleção 'vets'
-      await window.updateDoc(window.doc(window.firebaseDb, 'vets', vetId), vetData);
-      alert('Cadastro atualizado com sucesso!');
-    } else {
-      // Criar novo registro na coleção 'vets'
-      vetData.createdAt = new Date().toISOString();
-      await window.addDoc(window.collection(window.firebaseDb, 'vets'), vetData);
-      alert('Veterinário cadastrado com sucesso!');
+      document.getElementById('header-user-email').innerText = currentUser.email || '';
+      document.getElementById('header-user-role').innerText = `${currentUser.role || 'Colaborador'} • ${currentUser.accessLevel || 'Colaborador'}`;
+
+      const coordBtn = document.getElementById('nav-btn-coord');
+      const isCoord = (currentUser.accessLevel === 'Coordenação' || currentUser.accessLevel === 'Coordenador' || currentUser.role === 'Coordenador Veterinário');
+
+      if (isCoord) {
+        coordBtn.classList.remove('hidden');
+      } else {
+        coordBtn.classList.add('hidden');
+      }
     }
-    closeVetModal();
-    loadVetsList(); // Recarrega a tabela de colaboradores
-  } catch (error) {
-    console.error("Erro ao salvar na coleção vets:", error);
-    alert("Falha ao salvar cadastro: " + error.message);
-  }
-}
 
-// 3. Carregar lista de colaboradores no Painel da Coordenação
-async function loadVetsList() {
-  const vetsTableBody = document.getElementById('vets-table-body');
-  if (!vetsTableBody) return;
-  
-  vetsTableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4">A carregar...</td></tr>';
+    // FORMULÁRIO DE LOGIN
+    document.getElementById('form-login').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const pass = document.getElementById('login-password').value;
 
-  try {
-    const querySnap = await window.getDocs(window.collection(window.firebaseDb, 'vets'));
-    vetsTableBody.innerHTML = '';
-
-    querySnap.forEach((docSnap) => {
-      const data = docSnap.data();
-      const id = docSnap.id;
-
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td class="px-4 py-2 border-b">${data.name || '-'}</td>
-        <td class="px-4 py-2 border-b">${data.email || '-'}</td>
-        <td class="px-4 py-2 border-b">${data.role || '-'}</td>
-        <td class="px-4 py-2 border-b">${data.accessLevel || 'Colaborador'}</td>
-        <td class="px-4 py-2 border-b">${data.status || 'Ativo'}</td>
-        <td class="px-4 py-2 border-b text-center">
-          <button onclick="editVet('${id}')" class="text-blue-600 hover:underline mr-2">Editar</button>
-          <button onclick="deleteVet('${id}')" class="text-red-600 hover:underline">Excluir</button>
-        </td>
-      `;
-      vetsTableBody.appendChild(row);
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+      } catch (err) {
+        alert("Erro na autenticação: " + err.message);
+      }
     });
-  } catch (error) {
-    console.error("Erro ao carregar lista da coleção vets:", error);
-    vetsTableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-red-500">Erro ao carregar lista.</td></tr>';
-  }
-}
 
-// 4. Excluir cadastro da coleção 'vets'
-async function deleteVet(docId) {
-  if (confirm("Tem certeza que deseja excluir este cadastro?")) {
-    try {
-      await window.deleteDoc(window.doc(window.firebaseDb, 'vets', docId));
-      alert("Cadastro removido com sucesso!");
-      loadVetsList();
-    } catch (error) {
-      console.error("Erro ao excluir da coleção vets:", error);
-      alert("Erro ao excluir cadastro.");
+    // BOTÃO DE LOGOUT
+    document.getElementById('btn-logout').addEventListener('click', () => {
+      signOut(auth);
+    });
+
+    // NAVEGAÇÃO ENTRE ABAS
+    window.showScreen = function(screenId) {
+      hideAllScreens();
+      const screen = document.getElementById(screenId);
+      if (screen) screen.classList.remove('hidden');
+
+      if (screenId === 'screen-coord') {
+        loadVetsList();
+      } else if (screenId === 'screen-report') {
+        loadMyPunches();
+      }
+    };
+
+    function hideAllScreens() {
+      ['screen-login', 'screen-punch', 'screen-report', 'screen-coord'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
     }
-  }
-}
+
+    document.getElementById('nav-btn-punch').addEventListener('click', () => showScreen('screen-punch'));
+    document.getElementById('nav-btn-report').addEventListener('click', () => showScreen('screen-report'));
+    document.getElementById('nav-btn-coord').addEventListener('click', () => showScreen('screen-coord'));
+
+    // 2. CARREGAR LISTA DE COLABORADORES DA COLEÇÃO 'vets'
+    window.loadVetsList = async function() {
+      const vetsTableBody = document.getElementById('vets-table-body');
+      if (!vetsTableBody) return;
+
+      vetsTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">A carregar registros da coleção vets...</td></tr>';
+
+      try {
+        const querySnap = await getDocs(collection(db, 'vets'));
+        vetsTableBody.innerHTML = '';
+
+        if (querySnap.empty) {
+          vetsTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">Nenhum colaborador encontrado na coleção vets.</td></tr>';
+          return;
+        }
+
+        querySnap.forEach((docSnap) => {
+          const data = docSnap.data();
+          const id = docSnap.id;
+
+          const row = document.createElement('tr');
+          row.className = "hover:bg-slate-50 border-b border-slate-100";
+          row.innerHTML = `
+            <td class="p-3 font-medium text-slate-800">${data.name || data.userName || '-'}</td>
+            <td class="p-3 text-slate-600">${data.email || '-'}</td>
+            <td class="p-3 text-slate-600">${data.role || '-'}</td>
+            <td class="p-3"><span class="px-2 py-1 rounded-full text-xs font-semibold ${data.accessLevel === 'Coordenação' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-700'}">${data.accessLevel || 'Colaborador'}</span></td>
+            <td class="p-3"><span class="px-2 py-1 rounded-full text-xs font-semibold ${data.status === 'Ativo' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${data.status || 'Ativo'}</span></td>
+            <td class="p-3 text-center space-x-2">
+              <button onclick="editVet('${id}')" class="text-teal-600 hover:text-teal-800 text-xs font-semibold">Editar</button>
+              <button onclick="deleteVet('${id}')" class="text-rose-600 hover:text-rose-800 text-xs font-semibold">Excluir</button>
+            </td>
+          `;
+          vetsTableBody.appendChild(row);
+        });
+      } catch (error) {
+        console.error("Erro ao carregar lista da coleção vets:", error);
+        vetsTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-rose-500">Erro ao carregar lista de colaboradores.</td></tr>';
+      }
+    };
+
+    // 3. SALVAR OU ATUALIZAR REGISTRO NA COLEÇÃO 'vets'
+    window.saveVetForm = async function(event) {
+      event.preventDefault();
+      const vetId = document.getElementById('vet-id').value;
+
+      const vetData = {
+        name: document.getElementById('vet-name').value,
+        userName: document.getElementById('vet-username').value,
+        email: document.getElementById('vet-email').value,
+        role: document.getElementById('vet-role').value,
+        accessLevel: document.getElementById('vet-access').value,
+        status: document.getElementById('vet-status').value,
+        updatedAt: new Date().toISOString()
+      };
+
+      try {
+        if (vetId) {
+          await updateDoc(doc(db, 'vets', vetId), vetData);
+          alert('Cadastro atualizado com sucesso!');
+        } else {
+          vetData.createdAt = new Date().toISOString();
+          await addDoc(collection(db, 'vets'), vetData);
+          alert('Veterinário cadastrado com sucesso na coleção vets!');
+        }
+        closeVetModal();
+        loadVetsList();
+      } catch (error) {
+        console.error("Erro ao salvar na coleção vets:", error);
+        alert("Falha ao salvar cadastro: " + error.message);
+      }
+    };
+
+    // 4. EXCLUIR REGISTRO DA COLEÇÃO 'vets'
+    window.deleteVet = async function(docId) {
+      if (confirm("Tem certeza de que deseja remover este cadastro da coleção vets?")) {
+        try {
+          await deleteDoc(doc(db, 'vets', docId));
+          alert("Cadastro removido com sucesso!");
+          loadVetsList();
+        } catch (error) {
+          console.error("Erro ao excluir da coleção vets:", error);
+          alert("Erro ao excluir registro.");
+        }
+      }
+    };
+
+    // MODAL
+    window.openVetModal = function() {
+      document.getElementById('form-vet').reset();
+      document.getElementById('vet-id').value = '';
+      document.getElementById('modal-title').innerText = 'Cadastrar Veterinário';
+      document.getElementById('vet-modal').classList.remove('hidden');
+    };
+
+    window.closeVetModal = function() {
+      document.getElementById('vet-modal').classList.add('hidden');
+    };
+
+    window.editVet = async function(docId) {
+      try {
+        const snap = await getDoc(doc(db, 'vets', docId));
+        if (snap.exists()) {
+          const data = snap.data();
+          document.getElementById('vet-id').value = docId;
+          document.getElementById('vet-name').value = data.name || '';
+          document.getElementById('vet-username').value = data.userName || '';
+          document.getElementById('vet-email').value = data.email || '';
+          document.getElementById('vet-role').value = data.role || '';
+          document.getElementById('vet-access').value = data.accessLevel || 'Colaborador';
+          document.getElementById('vet-status').value = data.status || 'Ativo';
+          document.getElementById('modal-title').innerText = 'Editar Veterinário';
+          document.getElementById('vet-modal').classList.remove('hidden');
+        }
+      } catch (err) {
+        alert("Erro ao carregar dados para edição: " + err.message);
+      }
+    };
+
+    // 5. REGISTRAR PONTO
+    window.registerPunch = async function(type) {
+      if (!currentUser) return;
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+          await savePunch(type, pos.coords.latitude, pos.coords.longitude);
+        }, async () => {
+          await savePunch(type, null, null);
+        });
+      } else {
+        await savePunch(type, null, null);
+      }
+    };
+
+    async function savePunch(type, lat, lng) {
+      try {
+        await addDoc(collection(db, 'punches'), {
+          userId: currentUser.uid,
+          userEmail: currentUser.email,
+          userName: currentUser.name || currentUser.userName || currentUser.email,
+          type: type,
+          timestamp: new Date().toISOString(),
+          latitude: lat,
+          longitude: lng
+        });
+        alert(`Ponto registrado com sucesso: ${type}`);
+      } catch (err) {
+        alert("Erro ao registrar ponto: " + err.message);
+      }
+    }
+
+    // CARREGAR HISTÓRICO
+    async function loadMyPunches() {
+      const listEl = document.getElementById('my-punches-list');
+      if (!listEl || !currentUser) return;
+
+      listEl.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-400">A carregar registros...</td></tr>';
+
+      try {
+        const q = query(collection(db, 'punches'), where('userId', '==', currentUser.uid));
+        const snap = await getDocs(q);
+        listEl.innerHTML = '';
+
+        if (snap.empty) {
+          listEl.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-400">Nenhum registro de ponto efetuado até o momento.</td></tr>';
+          return;
+        }
+
+        snap.forEach((d) => {
+          const p = d.data();
+          const date = new Date(p.timestamp).toLocaleString('pt-BR');
+          const coords = (p.latitude && p.longitude) ? `${p.latitude.toFixed(4)}, ${p.longitude.toFixed(4)}` : 'Não capturado';
+
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td class="p-3 font-medium text-slate-800">${date}</td>
+            <td class="p-3 text-teal-600 font-semibold">${p.type}</td>
+            <td class="p-3 text-slate-500 text-xs">${coords}</td>
+          `;
+          listEl.appendChild(row);
+        });
+      } catch (err) {
+        console.error("Erro ao carregar histórico:", err);
+      }
+    }
+  </script>
+</body>
+</html>
