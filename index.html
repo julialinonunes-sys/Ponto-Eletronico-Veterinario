@@ -84,7 +84,7 @@
 
       <!-- BOTÕES COLORIDOS DE REGISTRO -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <button id="btn-punch-entrada" class="bg-emerald-700 hover:bg-emerald-800 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+        <button id="btn-punch-entrada" class="btn-punch-action bg-emerald-700 hover:bg-emerald-800 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36" data-type="Entrada">
           <div class="flex justify-between items-center w-full">
             <span class="text-xs uppercase tracking-wider font-bold opacity-80">Início</span>
             <i class="fa-solid fa-right-to-bracket text-2xl"></i>
@@ -95,7 +95,7 @@
           </div>
         </button>
 
-        <button id="btn-punch-almoco-saida" class="bg-amber-600 hover:bg-amber-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+        <button id="btn-punch-almoco-saida" class="btn-punch-action bg-amber-600 hover:bg-amber-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36" data-type="Saída Almoço">
           <div class="flex justify-between items-center w-full">
             <span class="text-xs uppercase tracking-wider font-bold opacity-80">Intervalo</span>
             <i class="fa-solid fa-utensils text-2xl"></i>
@@ -106,7 +106,7 @@
           </div>
         </button>
 
-        <button id="btn-punch-almoco-retorno" class="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+        <button id="btn-punch-almoco-retorno" class="btn-punch-action bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36" data-type="Retorno Almoço">
           <div class="flex justify-between items-center w-full">
             <span class="text-xs uppercase tracking-wider font-bold opacity-80">Retorno</span>
             <i class="fa-solid fa-rotate-left text-2xl"></i>
@@ -117,7 +117,7 @@
           </div>
         </button>
 
-        <button id="btn-punch-saida" class="bg-rose-700 hover:bg-rose-800 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+        <button id="btn-punch-saida" class="btn-punch-action bg-rose-700 hover:bg-rose-800 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36" data-type="Saída">
           <div class="flex justify-between items-center w-full">
             <span class="text-xs uppercase tracking-wider font-bold opacity-80">Fim</span>
             <i class="fa-solid fa-right-from-bracket text-2xl"></i>
@@ -128,7 +128,7 @@
           </div>
         </button>
 
-        <button id="btn-punch-plantao-entrada" class="bg-purple-700 hover:bg-purple-800 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+        <button id="btn-punch-plantao-entrada" class="btn-punch-action bg-purple-700 hover:bg-purple-800 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36" data-type="Entrada Plantão">
           <div class="flex justify-between items-center w-full">
             <span class="text-xs uppercase tracking-wider font-bold opacity-80">Plantão</span>
             <i class="fa-solid fa-user-clock text-2xl"></i>
@@ -139,7 +139,7 @@
           </div>
         </button>
 
-        <button id="btn-punch-plantao-saida" class="bg-indigo-700 hover:bg-indigo-800 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36">
+        <button id="btn-punch-plantao-saida" class="btn-punch-action bg-indigo-700 hover:bg-indigo-800 text-white p-6 rounded-xl shadow-md transition-transform active:scale-95 flex flex-col justify-between h-36" data-type="Saída Plantão">
           <div class="flex justify-between items-center w-full">
             <span class="text-xs uppercase tracking-wider font-bold opacity-80">Plantão</span>
             <i class="fa-solid fa-house-user text-2xl"></i>
@@ -251,7 +251,7 @@
           </div>
         </div>
 
-        <!-- TABELA DE REGISTROS DO COLABORADOR COM JUSTIFICATIVAS VISÍVEIS -->
+        <!-- TABELA DE REGISTROS -->
         <div class="overflow-x-auto border border-slate-200 rounded-xl">
           <table class="w-full text-left border-collapse">
             <thead>
@@ -296,6 +296,35 @@
     </section>
 
   </main>
+
+  <!-- MODAL DE JUSTIFICATIVA AO BATER O PONTO -->
+  <div id="modal-justification" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4 border border-slate-200">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+          <i class="fa-solid fa-comment-medical text-teal-600"></i>
+          <span>Confirmar Registro de Ponto</span>
+        </h3>
+        <button id="btn-cancel-punch" class="text-slate-400 hover:text-slate-600 text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div>
+        <p class="text-sm text-slate-600 mb-2">Você está registrando: <strong id="punch-type-title" class="text-teal-700"></strong></p>
+        <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Justificativa ou Observação (Opcional)</label>
+        <textarea id="punch-justification-input" rows="3" placeholder="Em caso de atrasos, emergências ou trocas de turno, descreva aqui..." class="w-full p-3 border border-slate-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-teal-500"></textarea>
+      </div>
+
+      <div class="flex justify-end space-x-3 pt-3 border-t">
+        <button id="btn-cancel-punch-btn" class="px-4 py-2 border rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50">Cancelar</button>
+        <button id="btn-confirm-punch" class="px-5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-bold shadow-sm flex items-center space-x-2">
+          <i class="fa-solid fa-check"></i>
+          <span>Confirmar e Salvar Ponto</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- MODAL DE LOGIN FLUTUANTE -->
   <div id="screen-login" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
@@ -393,7 +422,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT FIREBASE -->
+  <!-- SCRIPT FIREBASE COMPLETO -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -414,13 +443,14 @@
 
     let currentUser = null;
     let allVetsList = [];
+    let selectedPunchType = '';
 
-    // DATA ATUAL NOS FILTROS
+    // INICIALIZAÇÃO DE FILTROS DE DATA
     const now = new Date();
     document.getElementById('filter-month').value = now.getMonth();
     document.getElementById('filter-year').value = now.getFullYear();
 
-    // RELÓGIO
+    // RELÓGIO DA INTERFACE
     setInterval(() => {
       const current = new Date();
       const clockEl = document.getElementById('clock-display');
@@ -429,7 +459,7 @@
       if (dateEl) dateEl.innerText = current.toLocaleDateString('pt-BR', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
     }, 1000);
 
-    // CONTROLE DE SESSÃO
+    // CONTROLE DE SESSÃO DO USUÁRIO
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         await loadUserProfile(user);
@@ -446,7 +476,7 @@
       }
     });
 
-    // CARREGAR DADOS DO PERFIL
+    // CARREGAR DADOS DO VETERINÁRIO LOGADO (`vets`)
     async function loadUserProfile(user) {
       try {
         const vetDocRef = doc(db, 'vets', user.uid);
@@ -493,7 +523,7 @@
       }
     }
 
-    // LOGIN
+    // FORMULÁRIO DE LOGIN
     document.getElementById('form-login').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('login-email').value;
@@ -532,7 +562,62 @@
     document.getElementById('nav-btn-report').addEventListener('click', () => showScreen('screen-report'));
     document.getElementById('nav-btn-coord').addEventListener('click', () => showScreen('screen-coord'));
 
-    // CARREGAR LISTA DE VETERINÁRIOS
+    // ABRIR MODAL DE JUSTIFICATIVA AO CLICAR EM UM BOTÃO DE PONTO
+    document.querySelectorAll('.btn-punch-action').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const button = e.currentTarget;
+        selectedPunchType = button.getAttribute('data-type');
+        document.getElementById('punch-type-title').innerText = selectedPunchType;
+        document.getElementById('punch-justification-input').value = '';
+        document.getElementById('modal-justification').classList.remove('hidden');
+      });
+    });
+
+    // FECHAR MODAL DE JUSTIFICATIVA
+    function closeJustificationModal() {
+      document.getElementById('modal-justification').classList.add('hidden');
+    }
+
+    document.getElementById('btn-cancel-punch').addEventListener('click', closeJustificationModal);
+    document.getElementById('btn-cancel-punch-btn').addEventListener('click', closeJustificationModal);
+
+    // CONFIRMAR E SALVAR O PONTO NO FIRESTORE
+    document.getElementById('btn-confirm-punch').addEventListener('click', async () => {
+      if (!currentUser || !selectedPunchType) return;
+      const justificationText = document.getElementById('punch-justification-input').value.trim();
+
+      closeJustificationModal();
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+          await savePunch(selectedPunchType, pos.coords.latitude, pos.coords.longitude, justificationText);
+        }, async () => {
+          await savePunch(selectedPunchType, null, null, justificationText);
+        });
+      } else {
+        await savePunch(selectedPunchType, null, null, justificationText);
+      }
+    });
+
+    async function savePunch(type, lat, lng, justification) {
+      try {
+        await addDoc(collection(db, 'punches'), {
+          userId: currentUser.uid,
+          userEmail: currentUser.email,
+          userName: currentUser.name || currentUser.userName || currentUser.email,
+          type: type,
+          timestamp: new Date().toISOString(),
+          latitude: lat,
+          longitude: lng,
+          justification: justification
+        });
+        alert(`Ponto registrado com sucesso: ${type}`);
+      } catch (err) {
+        alert("Erro ao registrar ponto: " + err.message);
+      }
+    }
+
+    // CARREGAR LISTA DA COLEÇÃO 'vets' PARA TABELA E FILTROS
     async function loadVetsList() {
       const vetsTableBody = document.getElementById('vets-table-body');
       const filterSelect = document.getElementById('filter-vet');
@@ -590,7 +675,7 @@
       }
     }
 
-    // APLICAR FILTRO DE RELATÓRIO NO PAINEL DA COORDENAÇÃO
+    // APLICAR FILTRO E CÁLCULO DE HORAS NO PAINEL DA COORDENAÇÃO
     document.getElementById('btn-apply-filter').addEventListener('click', async () => {
       const vetId = document.getElementById('filter-vet').value;
       const targetMonth = parseInt(document.getElementById('filter-month').value);
@@ -650,9 +735,7 @@
 
           const dateFormatted = p.dateObj.toLocaleString('pt-BR');
           const coords = (p.latitude && p.longitude) ? `${p.latitude.toFixed(4)}, ${p.longitude.toFixed(4)}` : 'Não capturado';
-          
-          // JUSTIFICATIVA DADA PELO COLABORADOR
-          const justificationText = p.justification ? `<span class="text-amber-700 font-medium">${p.justification}</span>` : '<span class="text-slate-400 italic">Sem justificativa/emergência informada</span>';
+          const justificationText = p.justification ? `<span class="text-amber-700 font-semibold">${p.justification}</span>` : '<span class="text-slate-400 italic">Nenhuma informada</span>';
 
           const row = document.createElement('tr');
           row.className = "hover:bg-slate-50 border-b border-slate-100";
@@ -678,7 +761,7 @@
         document.querySelectorAll('.btn-add-just').forEach(btn => {
           btn.addEventListener('click', (e) => {
             const punchId = e.target.closest('button').getAttribute('data-punch-id');
-            addJustification(punchId);
+            editJustificationByCoord(punchId);
           });
         });
 
@@ -688,21 +771,21 @@
       }
     });
 
-    // COORDENAÇÃO TAMBÉM PODE EDITAR/ADICIONAR JUSTIFICATIVA
-    async function addJustification(punchId) {
-      const text = prompt("Digite ou altere a justificativa/observação para este registro:");
+    // EDIÇÃO DE JUSTIFICATIVA PELA COORDENAÇÃO
+    async function editJustificationByCoord(punchId) {
+      const text = prompt("Digite a alteração para a justificativa/observação deste ponto:");
       if (text !== null) {
         try {
           await updateDoc(doc(db, 'punches', punchId), { justification: text });
-          alert("Justificativa salva com sucesso!");
+          alert("Justificativa atualizada!");
           document.getElementById('btn-apply-filter').click();
         } catch (err) {
-          alert("Erro ao salvar justificativa: " + err.message);
+          alert("Erro ao editar justificativa: " + err.message);
         }
       }
     }
 
-    // FORMULÁRIO DE CADASTRO/EDIÇÃO DE VETERINÁRIO
+    // FORMULÁRIO DE VETERINÁRIOS
     document.getElementById('form-vet').addEventListener('submit', async (event) => {
       event.preventDefault();
       const vetId = document.getElementById('vet-id').value;
@@ -779,50 +862,7 @@
     document.getElementById('btn-close-modal-x').addEventListener('click', closeVetModal);
     document.getElementById('btn-close-modal-cancel').addEventListener('click', closeVetModal);
 
-    // REGISTRO DE PONTO COM CAPTURA DE JUSTIFICATIVA/EMERGÊNCIA
-    async function registerPunch(type) {
-      if (!currentUser) return;
-
-      // CAIXA DE TEXTO OBRIGATÓRIA/OPCIONAL PARA O COLABORADOR JUSTIFICAR ATRASOS OU EMERGÊNCIAS
-      const justification = prompt(`Deseja informar alguma justificativa ou emergência para o registro de ${type}? (Opcional - deixe em branco caso não haja):`) || '';
-
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(async (pos) => {
-          await savePunch(type, pos.coords.latitude, pos.coords.longitude, justification);
-        }, async () => {
-          await savePunch(type, null, null, justification);
-        });
-      } else {
-        await savePunch(type, null, null, justification);
-      }
-    }
-
-    async function savePunch(type, lat, lng, justification) {
-      try {
-        await addDoc(collection(db, 'punches'), {
-          userId: currentUser.uid,
-          userEmail: currentUser.email,
-          userName: currentUser.name || currentUser.userName || currentUser.email,
-          type: type,
-          timestamp: new Date().toISOString(),
-          latitude: lat,
-          longitude: lng,
-          justification: justification
-        });
-        alert(`Ponto registrado com sucesso: ${type}`);
-      } catch (err) {
-        alert("Erro ao registrar ponto: " + err.message);
-      }
-    }
-
-    document.getElementById('btn-punch-entrada').addEventListener('click', () => registerPunch('Entrada'));
-    document.getElementById('btn-punch-almoco-saida').addEventListener('click', () => registerPunch('Saída Almoço'));
-    document.getElementById('btn-punch-almoco-retorno').addEventListener('click', () => registerPunch('Retorno Almoço'));
-    document.getElementById('btn-punch-saida').addEventListener('click', () => registerPunch('Saída'));
-    document.getElementById('btn-punch-plantao-entrada').addEventListener('click', () => registerPunch('Entrada Plantão'));
-    document.getElementById('btn-punch-plantao-saida').addEventListener('click', () => registerPunch('Saída Plantão'));
-
-    // CARREGAR HISTÓRICO INDIVIDUAL DO COLABORADOR
+    // HISTÓRICO DO PRÓPRIO COLABORADOR
     async function loadMyPunches() {
       const listEl = document.getElementById('my-punches-list');
       if (!listEl || !currentUser) return;
