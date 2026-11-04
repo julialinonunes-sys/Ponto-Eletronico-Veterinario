@@ -152,7 +152,7 @@
       </div>
     </section>
 
-    <!-- TELA MEU RELATÓRIO MENSAL (LADO A LADO) -->
+    <!-- TELA MEU RELATÓRIO MENSAL -->
     <section id="screen-report" class="hidden space-y-6">
       <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
         <h2 class="text-xl font-bold text-slate-900 mb-4">Meu Histórico de Frequência Mensal</h2>
@@ -192,7 +192,7 @@
         </button>
       </div>
 
-      <!-- ÁREA DE FILTROS E RELATÓRIO MENSAL EM LINHAS DIÁRIAS (LADO A LADO) -->
+      <!-- ÁREA DE FILTROS E RELATÓRIO MENSAL EM LINHAS DIÁRIAS -->
       <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-6">
         <div class="border-b border-slate-200 pb-4">
           <h3 class="font-bold text-slate-800 text-base flex items-center space-x-2">
@@ -431,7 +431,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT FIREBASE COMPLETO COM AGRUPAMENTO HORIZONTAL -->
+  <!-- SCRIPT FIREBASE -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -565,7 +565,6 @@
     document.getElementById('nav-btn-report').addEventListener('click', () => showScreen('screen-report'));
     document.getElementById('nav-btn-coord').addEventListener('click', () => showScreen('screen-coord'));
 
-    // PONTO E JUSTIFICATIVA
     document.querySelectorAll('.btn-punch-action').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const button = e.currentTarget;
@@ -618,7 +617,6 @@
       }
     }
 
-    // LISTA VETS
     async function loadVetsList() {
       const vetsTableBody = document.getElementById('vets-table-body');
       const filterSelect = document.getElementById('filter-vet');
@@ -676,7 +674,6 @@
       }
     }
 
-    // FUNÇÃO PARA AGRUPAR PONTOS POR DATA (LADO A LADO)
     function groupPunchesByDate(punchesList) {
       const grouped = {};
 
@@ -740,7 +737,7 @@
       return grouped;
     }
 
-    // EXIBIÇÃO PAINEL DA COORDENAÇÃO (AGRUPADO DIA A DIA)
+    // PESQUISA COM SUPORTE A userId E userEmail
     document.getElementById('btn-apply-filter').addEventListener('click', async () => {
       const vetId = document.getElementById('filter-vet').value;
       const targetMonth = parseInt(document.getElementById('filter-month').value);
@@ -756,31 +753,41 @@
 
       const selectedVet = allVetsList.find(v => v.id === vetId);
       vetNameDisplay.innerText = selectedVet ? `${selectedVet.name || selectedVet.email} - Mês ${targetMonth + 1}/${targetYear}` : '';
-      tableBody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">A calcular horas e montar relatório...</td></tr>';
+      tableBody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">A buscar registros do colaborador...</td></tr>';
 
       try {
-        const q = query(collection(db, 'punches'), where('userId', '==', vetId));
-        const snap = await getDocs(q);
+        // Busca por userId
+        const q1 = query(collection(db, 'punches'), where('userId', '==', vetId));
+        let snap = await getDocs(q1);
 
-        if (snap.empty) {
+        let rawPunches = [];
+        snap.forEach(d => rawPunches.push({ id: d.id, ...d.data() }));
+
+        // Fallback por e-mail caso o userId não tenha sido vinculado ao Auth UID
+        if (rawPunches.length === 0 && selectedVet && selectedVet.email) {
+          const q2 = query(collection(db, 'punches'), where('userEmail', '==', selectedVet.email));
+          const snap2 = await getDocs(q2);
+          snap2.forEach(d => rawPunches.push({ id: d.id, ...d.data() }));
+        }
+
+        if (rawPunches.length === 0) {
           tableBody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">Nenhum ponto registrado para este colaborador.</td></tr>';
           hoursDisplay.innerText = "00h 00m";
           return;
         }
 
         let filteredPunches = [];
-        snap.forEach(docSnap => {
-          const data = docSnap.data();
+        rawPunches.forEach(data => {
           const pDate = new Date(data.timestamp);
           if (pDate.getMonth() === targetMonth && pDate.getFullYear() === targetYear) {
-            filteredPunches.push({ id: docSnap.id, ...data, dateObj: pDate });
+            filteredPunches.push({ ...data, dateObj: pDate });
           }
         });
 
         filteredPunches.sort((a, b) => a.dateObj - b.dateObj);
 
         if (filteredPunches.length === 0) {
-          tableBody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">Nenhum registro encontrado neste mês/ano.</td></tr>';
+          tableBody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">Nenhum ponto encontrado no mês/ano selecionado.</td></tr>';
           hoursDisplay.innerText = "00h 00m";
           return;
         }
@@ -823,12 +830,12 @@
         hoursDisplay.innerText = `${hours}h ${mins < 10 ? '0' : ''}${mins}m`;
 
       } catch (err) {
-        console.error("Erro ao filtrar registros:", err);
-        tableBody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-rose-500">Erro ao consultar histórico.</td></tr>';
+        console.error("Erro ao consultar pontos:", err);
+        tableBody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-rose-500 font-semibold">Erro ao consultar histórico: ${err.message}</td></tr>`;
       }
     });
 
-    // EDIÇÃO DE VETERINÁRIOS
+    // EDITAR E APAGAR COLABORADORES
     document.getElementById('form-vet').addEventListener('submit', async (event) => {
       event.preventDefault();
       const vetId = document.getElementById('vet-id').value;
@@ -905,7 +912,7 @@
     document.getElementById('btn-close-modal-x').addEventListener('click', closeVetModal);
     document.getElementById('btn-close-modal-cancel').addEventListener('click', closeVetModal);
 
-    // MEU RELATÓRIO MENSAL (LADO A LADO)
+    // MEU RELATÓRIO MENSAL
     async function loadMyPunches() {
       const listEl = document.getElementById('my-punches-list');
       if (!listEl || !currentUser) return;
