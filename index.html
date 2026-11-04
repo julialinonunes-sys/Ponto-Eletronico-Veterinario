@@ -152,22 +152,27 @@
       </div>
     </section>
 
-    <!-- TELA MEU RELATÓRIO MENSAL -->
+    <!-- TELA MEU RELATÓRIO MENSAL (LADO A LADO) -->
     <section id="screen-report" class="hidden space-y-6">
       <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-        <h2 class="text-xl font-bold text-slate-900 mb-4">Meu Histórico de Frequência</h2>
+        <h2 class="text-xl font-bold text-slate-900 mb-4">Meu Histórico de Frequência Mensal</h2>
         <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
+          <table class="w-full text-left border-collapse text-xs">
             <thead>
-              <tr class="bg-slate-50 border-b text-xs font-bold uppercase text-slate-600">
-                <th class="p-3">Data / Hora</th>
-                <th class="p-3">Tipo de Ponto</th>
-                <th class="p-3">Localização GPS</th>
-                <th class="p-3">Minha Justificativa / Observação</th>
+              <tr class="bg-slate-100 border-b text-slate-700 uppercase font-bold">
+                <th class="p-3">Data</th>
+                <th class="p-3 text-emerald-700">Entrada</th>
+                <th class="p-3 text-amber-700">S. Almoço</th>
+                <th class="p-3 text-blue-700">R. Almoço</th>
+                <th class="p-3 text-rose-700">Saída</th>
+                <th class="p-3 text-purple-700">Ent. Plantão</th>
+                <th class="p-3 text-indigo-700">Saí. Plantão</th>
+                <th class="p-3 text-slate-900">Total Dia</th>
+                <th class="p-3">Justificativas</th>
               </tr>
             </thead>
-            <tbody id="my-punches-list" class="divide-y divide-slate-100 text-sm">
-              <tr><td colspan="4" class="p-4 text-center text-slate-400">Nenhum registro encontrado.</td></tr>
+            <tbody id="my-punches-list" class="divide-y divide-slate-100">
+              <tr><td colspan="9" class="p-4 text-center text-slate-400">Nenhum registro encontrado.</td></tr>
             </tbody>
           </table>
         </div>
@@ -187,12 +192,12 @@
         </button>
       </div>
 
-      <!-- ÁREA DE FILTROS E RELATÓRIO MENSAL DA COORDENAÇÃO -->
+      <!-- ÁREA DE FILTROS E RELATÓRIO MENSAL EM LINHAS DIÁRIAS (LADO A LADO) -->
       <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-6">
         <div class="border-b border-slate-200 pb-4">
           <h3 class="font-bold text-slate-800 text-base flex items-center space-x-2">
             <i class="fa-solid fa-filter text-hovet-blue"></i>
-            <span>Relatório e Banco de Horas Por Colaborador</span>
+            <span>Espelho de Ponto e Relatório Mensal</span>
           </h3>
         </div>
 
@@ -251,26 +256,30 @@
           </div>
         </div>
 
-        <!-- TABELA DE REGISTROS -->
+        <!-- TABELA HORIZONTAL LADO A LADO POR DIA -->
         <div class="overflow-x-auto border border-slate-200 rounded-xl">
-          <table class="w-full text-left border-collapse">
+          <table class="w-full text-left border-collapse text-xs">
             <thead>
-              <tr class="bg-slate-100 border-b text-xs font-bold uppercase text-slate-600">
-                <th class="p-3">Data / Hora</th>
-                <th class="p-3">Tipo de Ponto</th>
-                <th class="p-3">Localização GPS</th>
-                <th class="p-3">Justificativa / Emergência</th>
-                <th class="p-3 text-center">Editar Justificativa</th>
+              <tr class="bg-slate-100 border-b text-slate-700 uppercase font-bold">
+                <th class="p-3">Data</th>
+                <th class="p-3 text-emerald-700">Entrada</th>
+                <th class="p-3 text-amber-700">Saída Almoço</th>
+                <th class="p-3 text-blue-700">Retorno Almoço</th>
+                <th class="p-3 text-rose-700">Saída</th>
+                <th class="p-3 text-purple-700">Ent. Plantão</th>
+                <th class="p-3 text-indigo-700">Saí. Plantão</th>
+                <th class="p-3 text-slate-900">Total Dia</th>
+                <th class="p-3">Justificativas e Observações</th>
               </tr>
             </thead>
-            <tbody id="filtered-punches-body" class="divide-y divide-slate-100 text-sm">
-              <tr><td colspan="5" class="p-4 text-center text-slate-400">Selecione um colaborador e clique em Filtrar para carregar os pontos.</td></tr>
+            <tbody id="filtered-punches-body" class="divide-y divide-slate-100">
+              <tr><td colspan="9" class="p-4 text-center text-slate-400">Selecione um colaborador e clique em Filtrar para carregar os pontos.</td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- TABELA DE COLABORADORES -->
+      <!-- TABELA DE COLABORADORES CADASTRADOS -->
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
           <h3 class="font-bold text-slate-800 text-sm uppercase">Colaboradores Cadastrados (`vets`)</h3>
@@ -422,7 +431,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT FIREBASE COMPLETO -->
+  <!-- SCRIPT FIREBASE COMPLETO COM AGRUPAMENTO HORIZONTAL -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -445,12 +454,10 @@
     let allVetsList = [];
     let selectedPunchType = '';
 
-    // INICIALIZAÇÃO DE FILTROS DE DATA
     const now = new Date();
     document.getElementById('filter-month').value = now.getMonth();
     document.getElementById('filter-year').value = now.getFullYear();
 
-    // RELÓGIO DA INTERFACE
     setInterval(() => {
       const current = new Date();
       const clockEl = document.getElementById('clock-display');
@@ -459,7 +466,6 @@
       if (dateEl) dateEl.innerText = current.toLocaleDateString('pt-BR', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
     }, 1000);
 
-    // CONTROLE DE SESSÃO DO USUÁRIO
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         await loadUserProfile(user);
@@ -476,7 +482,6 @@
       }
     });
 
-    // CARREGAR DADOS DO VETERINÁRIO LOGADO (`vets`)
     async function loadUserProfile(user) {
       try {
         const vetDocRef = doc(db, 'vets', user.uid);
@@ -523,7 +528,6 @@
       }
     }
 
-    // FORMULÁRIO DE LOGIN
     document.getElementById('form-login').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('login-email').value;
@@ -538,7 +542,6 @@
 
     document.getElementById('btn-logout').addEventListener('click', () => signOut(auth));
 
-    // NAVEGAÇÃO DE TELAS
     function showScreen(screenId) {
       hideAllScreens();
       const screen = document.getElementById(screenId);
@@ -562,7 +565,7 @@
     document.getElementById('nav-btn-report').addEventListener('click', () => showScreen('screen-report'));
     document.getElementById('nav-btn-coord').addEventListener('click', () => showScreen('screen-coord'));
 
-    // ABRIR MODAL DE JUSTIFICATIVA AO CLICAR EM UM BOTÃO DE PONTO
+    // PONTO E JUSTIFICATIVA
     document.querySelectorAll('.btn-punch-action').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const button = e.currentTarget;
@@ -573,7 +576,6 @@
       });
     });
 
-    // FECHAR MODAL DE JUSTIFICATIVA
     function closeJustificationModal() {
       document.getElementById('modal-justification').classList.add('hidden');
     }
@@ -581,7 +583,6 @@
     document.getElementById('btn-cancel-punch').addEventListener('click', closeJustificationModal);
     document.getElementById('btn-cancel-punch-btn').addEventListener('click', closeJustificationModal);
 
-    // CONFIRMAR E SALVAR O PONTO NO FIRESTORE
     document.getElementById('btn-confirm-punch').addEventListener('click', async () => {
       if (!currentUser || !selectedPunchType) return;
       const justificationText = document.getElementById('punch-justification-input').value.trim();
@@ -617,7 +618,7 @@
       }
     }
 
-    // CARREGAR LISTA DA COLEÇÃO 'vets' PARA TABELA E FILTROS
+    // LISTA VETS
     async function loadVetsList() {
       const vetsTableBody = document.getElementById('vets-table-body');
       const filterSelect = document.getElementById('filter-vet');
@@ -675,7 +676,71 @@
       }
     }
 
-    // APLICAR FILTRO E CÁLCULO DE HORAS NO PAINEL DA COORDENAÇÃO
+    // FUNÇÃO PARA AGRUPAR PONTOS POR DATA (LADO A LADO)
+    function groupPunchesByDate(punchesList) {
+      const grouped = {};
+
+      punchesList.forEach(p => {
+        const d = p.dateObj;
+        const dateKey = d.toLocaleDateString('pt-BR');
+
+        if (!grouped[dateKey]) {
+          grouped[dateKey] = {
+            dateStr: dateKey,
+            entrada: '--:--',
+            almocoSaida: '--:--',
+            almocoRetorno: '--:--',
+            saida: '--:--',
+            plantaoEntrada: '--:--',
+            plantaoSaida: '--:--',
+            justifications: [],
+            totalMs: 0,
+            inTime: null,
+            plantaoInTime: null
+          };
+        }
+
+        const timeStr = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        const type = p.type || '';
+
+        if (type === 'Entrada') {
+          grouped[dateKey].entrada = timeStr;
+          grouped[dateKey].inTime = d;
+        } else if (type === 'Saída Almoço') {
+          grouped[dateKey].almocoSaida = timeStr;
+          if (grouped[dateKey].inTime) {
+            grouped[dateKey].totalMs += (d - grouped[dateKey].inTime);
+            grouped[dateKey].inTime = null;
+          }
+        } else if (type === 'Retorno Almoço') {
+          grouped[dateKey].almocoRetorno = timeStr;
+          grouped[dateKey].inTime = d;
+        } else if (type === 'Saída') {
+          grouped[dateKey].saida = timeStr;
+          if (grouped[dateKey].inTime) {
+            grouped[dateKey].totalMs += (d - grouped[dateKey].inTime);
+            grouped[dateKey].inTime = null;
+          }
+        } else if (type === 'Entrada Plantão') {
+          grouped[dateKey].plantaoEntrada = timeStr;
+          grouped[dateKey].plantaoInTime = d;
+        } else if (type === 'Saída Plantão') {
+          grouped[dateKey].plantaoSaida = timeStr;
+          if (grouped[dateKey].plantaoInTime) {
+            grouped[dateKey].totalMs += (d - grouped[dateKey].plantaoInTime);
+            grouped[dateKey].plantaoInTime = null;
+          }
+        }
+
+        if (p.justification && p.justification.trim() !== '') {
+          grouped[dateKey].justifications.push(`[${type}]: ${p.justification}`);
+        }
+      });
+
+      return grouped;
+    }
+
+    // EXIBIÇÃO PAINEL DA COORDENAÇÃO (AGRUPADO DIA A DIA)
     document.getElementById('btn-apply-filter').addEventListener('click', async () => {
       const vetId = document.getElementById('filter-vet').value;
       const targetMonth = parseInt(document.getElementById('filter-month').value);
@@ -691,14 +756,14 @@
 
       const selectedVet = allVetsList.find(v => v.id === vetId);
       vetNameDisplay.innerText = selectedVet ? `${selectedVet.name || selectedVet.email} - Mês ${targetMonth + 1}/${targetYear}` : '';
-      tableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-400">A calcular horas e buscar registros...</td></tr>';
+      tableBody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">A calcular horas e montar relatório...</td></tr>';
 
       try {
         const q = query(collection(db, 'punches'), where('userId', '==', vetId));
         const snap = await getDocs(q);
 
         if (snap.empty) {
-          tableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-400">Nenhum ponto registrado para este colaborador.</td></tr>';
+          tableBody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">Nenhum ponto registrado para este colaborador.</td></tr>';
           hoursDisplay.innerText = "00h 00m";
           return;
         }
@@ -714,78 +779,56 @@
 
         filteredPunches.sort((a, b) => a.dateObj - b.dateObj);
 
-        tableBody.innerHTML = '';
         if (filteredPunches.length === 0) {
-          tableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-400">Nenhum registro encontrado neste mês/ano.</td></tr>';
+          tableBody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">Nenhum registro encontrado neste mês/ano.</td></tr>';
           hoursDisplay.innerText = "00h 00m";
           return;
         }
 
-        let totalMs = 0;
-        let lastInTime = null;
+        const groupedDays = groupPunchesByDate(filteredPunches);
+        tableBody.innerHTML = '';
 
-        filteredPunches.forEach(p => {
-          const type = p.type || '';
-          if (type.includes('Entrada') || type.includes('Retorno')) {
-            lastInTime = p.dateObj;
-          } else if ((type.includes('Saída') || type.includes('Intervalo')) && lastInTime) {
-            totalMs += (p.dateObj - lastInTime);
-            lastInTime = null;
-          }
+        let monthlyTotalMs = 0;
 
-          const dateFormatted = p.dateObj.toLocaleString('pt-BR');
-          const coords = (p.latitude && p.longitude) ? `${p.latitude.toFixed(4)}, ${p.longitude.toFixed(4)}` : 'Não capturado';
-          const justificationText = p.justification ? `<span class="text-amber-700 font-semibold">${p.justification}</span>` : '<span class="text-slate-400 italic">Nenhuma informada</span>';
+        Object.keys(groupedDays).forEach(dateKey => {
+          const day = groupedDays[dateKey];
+          monthlyTotalMs += day.totalMs;
+
+          const totalMins = Math.floor(day.totalMs / (1000 * 60));
+          const dHours = Math.floor(totalMins / 60);
+          const dMins = totalMins % 60;
+          const dayTotalStr = `${dHours}h ${dMins < 10 ? '0' : ''}${dMins}m`;
+
+          const justStr = day.justifications.length > 0 ? `<span class="text-amber-700 font-semibold">${day.justifications.join(' | ')}</span>` : '<span class="text-slate-400 italic">-</span>';
 
           const row = document.createElement('tr');
-          row.className = "hover:bg-slate-50 border-b border-slate-100";
+          row.className = "hover:bg-slate-50 border-b border-slate-100 font-mono";
           row.innerHTML = `
-            <td class="p-3 font-medium text-slate-800">${dateFormatted}</td>
-            <td class="p-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-hovet-blue border border-blue-200">${p.type}</span></td>
-            <td class="p-3 text-slate-500 text-xs">${coords}</td>
-            <td class="p-3 text-xs">${justificationText}</td>
-            <td class="p-3 text-center">
-              <button data-punch-id="${p.id}" class="btn-add-just text-teal-600 hover:text-teal-800 text-xs font-semibold">
-                <i class="fa-solid fa-pen-to-square"></i> Editar
-              </button>
-            </td>
+            <td class="p-3 font-sans font-medium text-slate-800">${day.dateStr}</td>
+            <td class="p-3 text-emerald-700 font-semibold">${day.entrada}</td>
+            <td class="p-3 text-amber-700 font-semibold">${day.almocoSaida}</td>
+            <td class="p-3 text-blue-700 font-semibold">${day.almocoRetorno}</td>
+            <td class="p-3 text-rose-700 font-semibold">${day.saida}</td>
+            <td class="p-3 text-purple-700 font-semibold">${day.plantaoEntrada}</td>
+            <td class="p-3 text-indigo-700 font-semibold">${day.plantaoSaida}</td>
+            <td class="p-3 text-slate-900 font-bold bg-slate-50">${dayTotalStr}</td>
+            <td class="p-3 font-sans text-xs">${justStr}</td>
           `;
           tableBody.appendChild(row);
         });
 
-        const totalMinutes = Math.floor(totalMs / (1000 * 60));
+        const totalMinutes = Math.floor(monthlyTotalMs / (1000 * 60));
         const hours = Math.floor(totalMinutes / 60);
         const mins = totalMinutes % 60;
         hoursDisplay.innerText = `${hours}h ${mins < 10 ? '0' : ''}${mins}m`;
 
-        document.querySelectorAll('.btn-add-just').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            const punchId = e.target.closest('button').getAttribute('data-punch-id');
-            editJustificationByCoord(punchId);
-          });
-        });
-
       } catch (err) {
         console.error("Erro ao filtrar registros:", err);
-        tableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-rose-500">Erro ao consultar histórico.</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-rose-500">Erro ao consultar histórico.</td></tr>';
       }
     });
 
-    // EDIÇÃO DE JUSTIFICATIVA PELA COORDENAÇÃO
-    async function editJustificationByCoord(punchId) {
-      const text = prompt("Digite a alteração para a justificativa/observação deste ponto:");
-      if (text !== null) {
-        try {
-          await updateDoc(doc(db, 'punches', punchId), { justification: text });
-          alert("Justificativa atualizada!");
-          document.getElementById('btn-apply-filter').click();
-        } catch (err) {
-          alert("Erro ao editar justificativa: " + err.message);
-        }
-      }
-    }
-
-    // FORMULÁRIO DE VETERINÁRIOS
+    // EDIÇÃO DE VETERINÁRIOS
     document.getElementById('form-vet').addEventListener('submit', async (event) => {
       event.preventDefault();
       const vetId = document.getElementById('vet-id').value;
@@ -862,12 +905,12 @@
     document.getElementById('btn-close-modal-x').addEventListener('click', closeVetModal);
     document.getElementById('btn-close-modal-cancel').addEventListener('click', closeVetModal);
 
-    // HISTÓRICO DO PRÓPRIO COLABORADOR
+    // MEU RELATÓRIO MENSAL (LADO A LADO)
     async function loadMyPunches() {
       const listEl = document.getElementById('my-punches-list');
       if (!listEl || !currentUser) return;
 
-      listEl.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400">A carregar registros...</td></tr>';
+      listEl.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">A carregar registros...</td></tr>';
 
       try {
         const q = query(collection(db, 'punches'), where('userId', '==', currentUser.uid));
@@ -875,25 +918,45 @@
         listEl.innerHTML = '';
 
         if (snap.empty) {
-          listEl.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400">Nenhum registro encontrado.</td></tr>';
+          listEl.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">Nenhum registro encontrado.</td></tr>';
           return;
         }
 
+        let myPunches = [];
         snap.forEach((d) => {
           const p = d.data();
-          const date = new Date(p.timestamp).toLocaleString('pt-BR');
-          const coords = (p.latitude && p.longitude) ? `${p.latitude.toFixed(4)}, ${p.longitude.toFixed(4)}` : 'Não capturado';
-          const just = p.justification ? `<span class="text-amber-700 font-medium">${p.justification}</span>` : '<span class="text-slate-400 italic">Nenhuma</span>';
+          myPunches.push({ id: d.id, ...p, dateObj: new Date(p.timestamp) });
+        });
+
+        myPunches.sort((a, b) => a.dateObj - b.dateObj);
+        const groupedDays = groupPunchesByDate(myPunches);
+
+        Object.keys(groupedDays).forEach(dateKey => {
+          const day = groupedDays[dateKey];
+
+          const totalMins = Math.floor(day.totalMs / (1000 * 60));
+          const dHours = Math.floor(totalMins / 60);
+          const dMins = totalMins % 60;
+          const dayTotalStr = `${dHours}h ${dMins < 10 ? '0' : ''}${dMins}m`;
+
+          const justStr = day.justifications.length > 0 ? `<span class="text-amber-700 font-semibold">${day.justifications.join(' | ')}</span>` : '<span class="text-slate-400 italic">-</span>';
 
           const row = document.createElement('tr');
+          row.className = "hover:bg-slate-50 border-b border-slate-100 font-mono";
           row.innerHTML = `
-            <td class="p-3 font-medium text-slate-800">${date}</td>
-            <td class="p-3 font-semibold text-hovet-blue">${p.type}</td>
-            <td class="p-3 text-slate-500 text-xs">${coords}</td>
-            <td class="p-3 text-xs">${just}</td>
+            <td class="p-3 font-sans font-medium text-slate-800">${day.dateStr}</td>
+            <td class="p-3 text-emerald-700 font-semibold">${day.entrada}</td>
+            <td class="p-3 text-amber-700 font-semibold">${day.almocoSaida}</td>
+            <td class="p-3 text-blue-700 font-semibold">${day.almocoRetorno}</td>
+            <td class="p-3 text-rose-700 font-semibold">${day.saida}</td>
+            <td class="p-3 text-purple-700 font-semibold">${day.plantaoEntrada}</td>
+            <td class="p-3 text-indigo-700 font-semibold">${day.plantaoSaida}</td>
+            <td class="p-3 text-slate-900 font-bold bg-slate-50">${dayTotalStr}</td>
+            <td class="p-3 font-sans text-xs">${justStr}</td>
           `;
           listEl.appendChild(row);
         });
+
       } catch (err) {
         console.error("Erro ao carregar histórico:", err);
       }
