@@ -192,12 +192,47 @@
         </button>
       </div>
 
-      <!-- ÁREA DE FILTROS E RELATÓRIO MENSAL EM LINHAS DIÁRIAS -->
+      <!-- NOVO: TABELA GERAL DIÁRIA (EXIBIDA AUTOMATICAMENTE SEM FILTRO) -->
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+          <h3 class="font-bold text-slate-800 text-base flex items-center space-x-2">
+            <i class="fa-solid fa-calendar-day text-teal-600"></i>
+            <span>Frequência Geral de Hoje (<span id="today-date-label"></span>)</span>
+          </h3>
+          <button id="btn-refresh-today" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-1.5 rounded-lg transition-colors flex items-center space-x-1">
+            <i class="fa-solid fa-rotate-right"></i>
+            <span>Atualizar Hoje</span>
+          </button>
+        </div>
+
+        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-100 border-b text-slate-700 uppercase font-bold">
+                <th class="p-3">Colaborador</th>
+                <th class="p-3 text-emerald-700">Entrada</th>
+                <th class="p-3 text-amber-700">Saída Almoço</th>
+                <th class="p-3 text-blue-700">Retorno Almoço</th>
+                <th class="p-3 text-rose-700">Saída</th>
+                <th class="p-3 text-purple-700">Ent. Plantão</th>
+                <th class="p-3 text-indigo-700">Saí. Plantão</th>
+                <th class="p-3 text-slate-900">Total Hoje</th>
+                <th class="p-3">Justificativas do Dia</th>
+              </tr>
+            </thead>
+            <tbody id="today-punches-body" class="divide-y divide-slate-100">
+              <tr><td colspan="9" class="p-4 text-center text-slate-400">A carregar registros do dia...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ÁREA DE FILTROS E RELATÓRIO MENSAL INDIVIDUAL -->
       <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-6">
         <div class="border-b border-slate-200 pb-4">
           <h3 class="font-bold text-slate-800 text-base flex items-center space-x-2">
             <i class="fa-solid fa-filter text-hovet-blue"></i>
-            <span>Espelho de Ponto e Relatório Mensal</span>
+            <span>Relatório Mensal Por Colaborador</span>
           </h3>
         </div>
 
@@ -256,7 +291,7 @@
           </div>
         </div>
 
-        <!-- TABELA HORIZONTAL LADO A LADO POR DIA -->
+        <!-- TABELA HORIZONTAL MENSAL DO COLABORADOR -->
         <div class="overflow-x-auto border border-slate-200 rounded-xl">
           <table class="w-full text-left border-collapse text-xs">
             <thead>
@@ -549,6 +584,7 @@
 
       if (screenId === 'screen-coord') {
         loadVetsList();
+        loadTodayAllPunches(); // CARREGA AUTOMATICAMENTE A FREQUÊNCIA DE HOJE
       } else if (screenId === 'screen-report') {
         loadMyPunches();
       }
@@ -674,6 +710,125 @@
       }
     }
 
+    // CARREGA TODOS OS PONTOS DO DIA ATUAL PARA TODOS OS COLABORADORES
+    async function loadTodayAllPunches() {
+      const tbody = document.getElementById('today-punches-body');
+      const dateLabel = document.getElementById('today-date-label');
+      if (!tbody) return;
+
+      const todayStr = new Date().toLocaleDateString('pt-BR');
+      if (dateLabel) dateLabel.innerText = todayStr;
+
+      tbody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">A carregar registros do dia...</td></tr>';
+
+      try {
+        const snap = await getDocs(collection(db, 'punches'));
+        if (snap.empty) {
+          tbody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">Nenhum ponto registrado no sistema hoje.</td></tr>';
+          return;
+        }
+
+        const todayUsers = {};
+
+        snap.forEach(d => {
+          const p = d.data();
+          const pDate = new Date(p.timestamp);
+          if (pDate.toLocaleDateString('pt-BR') === todayStr) {
+            const userName = p.userName || p.userEmail || 'Desconhecido';
+            if (!todayUsers[userName]) {
+              todayUsers[userName] = {
+                name: userName,
+                entrada: '--:--',
+                almocoSaida: '--:--',
+                almocoRetorno: '--:--',
+                saida: '--:--',
+                plantaoEntrada: '--:--',
+                plantaoSaida: '--:--',
+                totalMs: 0,
+                inTime: null,
+                plantaoInTime: null,
+                justifications: []
+              };
+            }
+
+            const timeStr = pDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            const type = p.type || '';
+
+            if (type === 'Entrada') {
+              todayUsers[userName].entrada = timeStr;
+              todayUsers[userName].inTime = pDate;
+            } else if (type === 'Saída Almoço') {
+              todayUsers[userName].almocoSaida = timeStr;
+              if (todayUsers[userName].inTime) {
+                todayUsers[userName].totalMs += (pDate - todayUsers[userName].inTime);
+                todayUsers[userName].inTime = null;
+              }
+            } else if (type === 'Retorno Almoço') {
+              todayUsers[userName].almocoRetorno = timeStr;
+              todayUsers[userName].inTime = pDate;
+            } else if (type === 'Saída') {
+              todayUsers[userName].saida = timeStr;
+              if (todayUsers[userName].inTime) {
+                todayUsers[userName].totalMs += (pDate - todayUsers[userName].inTime);
+                todayUsers[userName].inTime = null;
+              }
+            } else if (type === 'Entrada Plantão') {
+              todayUsers[userName].plantaoEntrada = timeStr;
+              todayUsers[userName].plantaoInTime = pDate;
+            } else if (type === 'Saída Plantão') {
+              todayUsers[userName].plantaoSaida = timeStr;
+              if (todayUsers[userName].plantaoInTime) {
+                todayUsers[userName].totalMs += (pDate - todayUsers[userName].plantaoInTime);
+                todayUsers[userName].plantaoInTime = null;
+              }
+            }
+
+            if (p.justification && p.justification.trim() !== '') {
+              todayUsers[userName].justifications.push(`[${type}]: ${p.justification}`);
+            }
+          }
+        });
+
+        tbody.innerHTML = '';
+        const userKeys = Object.keys(todayUsers);
+
+        if (userKeys.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">Nenhum ponto registrado hoje até o momento.</td></tr>';
+          return;
+        }
+
+        userKeys.forEach(uKey => {
+          const u = todayUsers[uKey];
+          const totalMins = Math.floor(u.totalMs / (1000 * 60));
+          const hours = Math.floor(totalMins / 60);
+          const mins = totalMins % 60;
+          const totalStr = `${hours}h ${mins < 10 ? '0' : ''}${mins}m`;
+          const justStr = u.justifications.length > 0 ? `<span class="text-amber-700 font-semibold">${u.justifications.join(' | ')}</span>` : '<span class="text-slate-400 italic">-</span>';
+
+          const row = document.createElement('tr');
+          row.className = "hover:bg-slate-50 border-b border-slate-100 font-mono";
+          row.innerHTML = `
+            <td class="p-3 font-sans font-bold text-slate-800">${u.name}</td>
+            <td class="p-3 text-emerald-700 font-semibold">${u.entrada}</td>
+            <td class="p-3 text-amber-700 font-semibold">${u.almocoSaida}</td>
+            <td class="p-3 text-blue-700 font-semibold">${u.almocoRetorno}</td>
+            <td class="p-3 text-rose-700 font-semibold">${u.saida}</td>
+            <td class="p-3 text-purple-700 font-semibold">${u.plantaoEntrada}</td>
+            <td class="p-3 text-indigo-700 font-semibold">${u.plantaoSaida}</td>
+            <td class="p-3 text-slate-900 font-bold bg-slate-50">${totalStr}</td>
+            <td class="p-3 font-sans text-xs">${justStr}</td>
+          `;
+          tbody.appendChild(row);
+        });
+
+      } catch (err) {
+        console.error("Erro ao carregar pontos do dia:", err);
+        tbody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-rose-500">Erro ao carregar dados do dia.</td></tr>';
+      }
+    }
+
+    document.getElementById('btn-refresh-today').addEventListener('click', loadTodayAllPunches);
+
     function groupPunchesByDate(punchesList) {
       const grouped = {};
 
@@ -737,7 +892,7 @@
       return grouped;
     }
 
-    // PESQUISA COM SUPORTE A userId E userEmail
+    // PESQUISA COM FILTRO POR COLABORADOR
     document.getElementById('btn-apply-filter').addEventListener('click', async () => {
       const vetId = document.getElementById('filter-vet').value;
       const targetMonth = parseInt(document.getElementById('filter-month').value);
@@ -756,14 +911,12 @@
       tableBody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">A buscar registros do colaborador...</td></tr>';
 
       try {
-        // Busca por userId
         const q1 = query(collection(db, 'punches'), where('userId', '==', vetId));
         let snap = await getDocs(q1);
 
         let rawPunches = [];
         snap.forEach(d => rawPunches.push({ id: d.id, ...d.data() }));
 
-        // Fallback por e-mail caso o userId não tenha sido vinculado ao Auth UID
         if (rawPunches.length === 0 && selectedVet && selectedVet.email) {
           const q2 = query(collection(db, 'punches'), where('userEmail', '==', selectedVet.email));
           const snap2 = await getDocs(q2);
@@ -835,7 +988,7 @@
       }
     });
 
-    // EDITAR E APAGAR COLABORADORES
+    // FORMULÁRIO DE CADASTRO/EDIÇÃO DE VETERINÁRIOS
     document.getElementById('form-vet').addEventListener('submit', async (event) => {
       event.preventDefault();
       const vetId = document.getElementById('vet-id').value;
@@ -971,4 +1124,3 @@
   </script>
 </body>
 </html>
-  
