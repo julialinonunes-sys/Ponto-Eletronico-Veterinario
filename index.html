@@ -58,7 +58,7 @@
     </nav>
   </header>
 
-  <!-- CONTEÚDO DE FUNDO (TELAS DA APLICAÇÃO) -->
+  <!-- CONTEÚDO PRINCIPAL -->
   <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 z-10">
 
     <!-- TELA DE REGISTRO DE PONTO -->
@@ -163,7 +163,7 @@
                 <th class="p-3">Data / Hora</th>
                 <th class="p-3">Tipo de Ponto</th>
                 <th class="p-3">Localização GPS</th>
-                <th class="p-3">Justificativa</th>
+                <th class="p-3">Minha Justificativa / Observação</th>
               </tr>
             </thead>
             <tbody id="my-punches-list" class="divide-y divide-slate-100 text-sm">
@@ -174,12 +174,12 @@
       </div>
     </section>
 
-    <!-- PAINEL DA COORDENAÇÃO COM FILTROS E BANCO DE HORAS -->
+    <!-- PAINEL DA COORDENAÇÃO -->
     <section id="screen-coord" class="hidden space-y-6">
       <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h2 class="text-xl font-bold text-slate-900">Painel de Gestão da Coordenação</h2>
-          <p class="text-sm text-slate-500">Acompanhamento de registros e banco de horas da equipe</p>
+          <p class="text-sm text-slate-500">Acompanhamento de registros, justificativas e banco de horas da equipe</p>
         </div>
         <button id="btn-open-modal" class="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2.5 rounded-lg shadow-sm flex items-center space-x-2 text-sm">
           <i class="fa-solid fa-user-plus"></i>
@@ -187,7 +187,7 @@
         </button>
       </div>
 
-      <!-- ÁREA DE FILTROS E RELATÓRIO MENSAL -->
+      <!-- ÁREA DE FILTROS E RELATÓRIO MENSAL DA COORDENAÇÃO -->
       <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-6">
         <div class="border-b border-slate-200 pb-4">
           <h3 class="font-bold text-slate-800 text-base flex items-center space-x-2">
@@ -235,7 +235,7 @@
           </div>
         </div>
 
-        <!-- CARTÃO DE TOTALIZADOR DE HORAS -->
+        <!-- TOTALIZADOR DE HORAS -->
         <div id="total-hours-card" class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div class="flex items-center space-x-3">
             <div class="bg-hovet-blue text-white p-3 rounded-xl">
@@ -251,7 +251,7 @@
           </div>
         </div>
 
-        <!-- TABELA DE REGISTROS DO COLABORADOR -->
+        <!-- TABELA DE REGISTROS DO COLABORADOR COM JUSTIFICATIVAS VISÍVEIS -->
         <div class="overflow-x-auto border border-slate-200 rounded-xl">
           <table class="w-full text-left border-collapse">
             <thead>
@@ -259,8 +259,8 @@
                 <th class="p-3">Data / Hora</th>
                 <th class="p-3">Tipo de Ponto</th>
                 <th class="p-3">Localização GPS</th>
-                <th class="p-3">Justificativa / Observação</th>
-                <th class="p-3 text-center">Ação</th>
+                <th class="p-3">Justificativa / Emergência</th>
+                <th class="p-3 text-center">Editar Justificativa</th>
               </tr>
             </thead>
             <tbody id="filtered-punches-body" class="divide-y divide-slate-100 text-sm">
@@ -270,7 +270,7 @@
         </div>
       </div>
 
-      <!-- TABELA DE COLABORADORES CADASTRADOS -->
+      <!-- TABELA DE COLABORADORES -->
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
           <h3 class="font-bold text-slate-800 text-sm uppercase">Colaboradores Cadastrados (`vets`)</h3>
@@ -393,7 +393,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT FIREBASE COMPLETO -->
+  <!-- SCRIPT FIREBASE -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -420,7 +420,7 @@
     document.getElementById('filter-month').value = now.getMonth();
     document.getElementById('filter-year').value = now.getFullYear();
 
-    // RELÓGIO DA INTERFACE
+    // RELÓGIO
     setInterval(() => {
       const current = new Date();
       const clockEl = document.getElementById('clock-display');
@@ -446,7 +446,7 @@
       }
     });
 
-    // CARREGAR DADOS DO PERFIL DA COLEÇÃO 'vets'
+    // CARREGAR DADOS DO PERFIL
     async function loadUserProfile(user) {
       try {
         const vetDocRef = doc(db, 'vets', user.uid);
@@ -493,7 +493,7 @@
       }
     }
 
-    // FORMULÁRIO DE LOGIN
+    // LOGIN
     document.getElementById('form-login').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('login-email').value;
@@ -532,7 +532,7 @@
     document.getElementById('nav-btn-report').addEventListener('click', () => showScreen('screen-report'));
     document.getElementById('nav-btn-coord').addEventListener('click', () => showScreen('screen-coord'));
 
-    // GESTÃO DA COLEÇÃO 'vets' E PREENCHIMENTO DO SELECT DE FILTRO
+    // CARREGAR LISTA DE VETERINÁRIOS
     async function loadVetsList() {
       const vetsTableBody = document.getElementById('vets-table-body');
       const filterSelect = document.getElementById('filter-vet');
@@ -556,13 +556,11 @@
           const id = docSnap.id;
           allVetsList.push({ id, ...data });
 
-          // Opção para o filtro
           const opt = document.createElement('option');
           opt.value = id;
           opt.innerText = `${data.name || data.userName || data.email} (${data.role || 'Veterinário'})`;
           filterSelect.appendChild(opt);
 
-          // Linha da tabela
           const row = document.createElement('tr');
           row.className = "hover:bg-slate-50 border-b border-slate-100";
           row.innerHTML = `
@@ -592,7 +590,7 @@
       }
     }
 
-    // APLICAR FILTRO DE BANCO DE HORAS E PONTOS
+    // APLICAR FILTRO DE RELATÓRIO NO PAINEL DA COORDENAÇÃO
     document.getElementById('btn-apply-filter').addEventListener('click', async () => {
       const vetId = document.getElementById('filter-vet').value;
       const targetMonth = parseInt(document.getElementById('filter-month').value);
@@ -629,7 +627,6 @@
           }
         });
 
-        // Ordenar por data
         filteredPunches.sort((a, b) => a.dateObj - b.dateObj);
 
         tableBody.innerHTML = '';
@@ -639,7 +636,6 @@
           return;
         }
 
-        // CÁLCULO DE HORAS TRABALHADAS
         let totalMs = 0;
         let lastInTime = null;
 
@@ -654,6 +650,9 @@
 
           const dateFormatted = p.dateObj.toLocaleString('pt-BR');
           const coords = (p.latitude && p.longitude) ? `${p.latitude.toFixed(4)}, ${p.longitude.toFixed(4)}` : 'Não capturado';
+          
+          // JUSTIFICATIVA DADA PELO COLABORADOR
+          const justificationText = p.justification ? `<span class="text-amber-700 font-medium">${p.justification}</span>` : '<span class="text-slate-400 italic">Sem justificativa/emergência informada</span>';
 
           const row = document.createElement('tr');
           row.className = "hover:bg-slate-50 border-b border-slate-100";
@@ -661,23 +660,21 @@
             <td class="p-3 font-medium text-slate-800">${dateFormatted}</td>
             <td class="p-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-hovet-blue border border-blue-200">${p.type}</span></td>
             <td class="p-3 text-slate-500 text-xs">${coords}</td>
-            <td class="p-3 text-slate-600 italic text-xs">${p.justification || 'Sem observações'}</td>
+            <td class="p-3 text-xs">${justificationText}</td>
             <td class="p-3 text-center">
               <button data-punch-id="${p.id}" class="btn-add-just text-teal-600 hover:text-teal-800 text-xs font-semibold">
-                <i class="fa-solid fa-pen-to-square"></i> Justificar
+                <i class="fa-solid fa-pen-to-square"></i> Editar
               </button>
             </td>
           `;
           tableBody.appendChild(row);
         });
 
-        // CONVERTER MS PARA HORAS E MINUTOS
         const totalMinutes = Math.floor(totalMs / (1000 * 60));
         const hours = Math.floor(totalMinutes / 60);
         const mins = totalMinutes % 60;
         hoursDisplay.innerText = `${hours}h ${mins < 10 ? '0' : ''}${mins}m`;
 
-        // ADICIONAR JUSTIFICATIVA
         document.querySelectorAll('.btn-add-just').forEach(btn => {
           btn.addEventListener('click', (e) => {
             const punchId = e.target.closest('button').getAttribute('data-punch-id');
@@ -691,9 +688,9 @@
       }
     });
 
-    // FUNÇÃO PARA ADICIONAR JUSTIFICATIVA EM UM PONTO
+    // COORDENAÇÃO TAMBÉM PODE EDITAR/ADICIONAR JUSTIFICATIVA
     async function addJustification(punchId) {
-      const text = prompt("Digite a justificativa ou observação para este registro:");
+      const text = prompt("Digite ou altere a justificativa/observação para este registro:");
       if (text !== null) {
         try {
           await updateDoc(doc(db, 'punches', punchId), { justification: text });
@@ -705,7 +702,7 @@
       }
     }
 
-    // FORMULÁRIO E MODAIS
+    // FORMULÁRIO DE CADASTRO/EDIÇÃO DE VETERINÁRIO
     document.getElementById('form-vet').addEventListener('submit', async (event) => {
       event.preventDefault();
       const vetId = document.getElementById('vet-id').value;
@@ -782,22 +779,25 @@
     document.getElementById('btn-close-modal-x').addEventListener('click', closeVetModal);
     document.getElementById('btn-close-modal-cancel').addEventListener('click', closeVetModal);
 
-    // REGISTRO DE PONTO E HISTÓRICO INDIVIDUAL
+    // REGISTRO DE PONTO COM CAPTURA DE JUSTIFICATIVA/EMERGÊNCIA
     async function registerPunch(type) {
       if (!currentUser) return;
 
+      // CAIXA DE TEXTO OBRIGATÓRIA/OPCIONAL PARA O COLABORADOR JUSTIFICAR ATRASOS OU EMERGÊNCIAS
+      const justification = prompt(`Deseja informar alguma justificativa ou emergência para o registro de ${type}? (Opcional - deixe em branco caso não haja):`) || '';
+
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(async (pos) => {
-          await savePunch(type, pos.coords.latitude, pos.coords.longitude);
+          await savePunch(type, pos.coords.latitude, pos.coords.longitude, justification);
         }, async () => {
-          await savePunch(type, null, null);
+          await savePunch(type, null, null, justification);
         });
       } else {
-        await savePunch(type, null, null);
+        await savePunch(type, null, null, justification);
       }
     }
 
-    async function savePunch(type, lat, lng) {
+    async function savePunch(type, lat, lng, justification) {
       try {
         await addDoc(collection(db, 'punches'), {
           userId: currentUser.uid,
@@ -807,7 +807,7 @@
           timestamp: new Date().toISOString(),
           latitude: lat,
           longitude: lng,
-          justification: ''
+          justification: justification
         });
         alert(`Ponto registrado com sucesso: ${type}`);
       } catch (err) {
@@ -822,6 +822,7 @@
     document.getElementById('btn-punch-plantao-entrada').addEventListener('click', () => registerPunch('Entrada Plantão'));
     document.getElementById('btn-punch-plantao-saida').addEventListener('click', () => registerPunch('Saída Plantão'));
 
+    // CARREGAR HISTÓRICO INDIVIDUAL DO COLABORADOR
     async function loadMyPunches() {
       const listEl = document.getElementById('my-punches-list');
       if (!listEl || !currentUser) return;
@@ -842,13 +843,14 @@
           const p = d.data();
           const date = new Date(p.timestamp).toLocaleString('pt-BR');
           const coords = (p.latitude && p.longitude) ? `${p.latitude.toFixed(4)}, ${p.longitude.toFixed(4)}` : 'Não capturado';
+          const just = p.justification ? `<span class="text-amber-700 font-medium">${p.justification}</span>` : '<span class="text-slate-400 italic">Nenhuma</span>';
 
           const row = document.createElement('tr');
           row.innerHTML = `
             <td class="p-3 font-medium text-slate-800">${date}</td>
             <td class="p-3 font-semibold text-hovet-blue">${p.type}</td>
             <td class="p-3 text-slate-500 text-xs">${coords}</td>
-            <td class="p-3 text-slate-600 text-xs italic">${p.justification || 'Nenhuma'}</td>
+            <td class="p-3 text-xs">${just}</td>
           `;
           listEl.appendChild(row);
         });
