@@ -66,8 +66,8 @@
       <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-center space-x-3 text-emerald-800 text-sm">
         <i class="fa-solid fa-location-dot text-emerald-600 text-lg"></i>
         <div>
-          <span class="font-bold">LOCALIZAÇÃO PARA REGISTRO</span>
-          <p id="location-display" class="text-xs text-emerald-700">Capturando coordenadas GPS...</p>
+          <span class="font-bold">STATUS DA LOCALIZAÇÃO</span>
+          <p id="location-display" class="text-xs text-emerald-700">Aguardando registro para capturar coordenadas GPS...</p>
         </div>
       </div>
 
@@ -168,11 +168,12 @@
                 <th class="p-3 text-purple-700">Ent. Plantão</th>
                 <th class="p-3 text-indigo-700">Saí. Plantão</th>
                 <th class="p-3 text-slate-900">Total Dia</th>
+                <th class="p-3">Localização (GPS)</th>
                 <th class="p-3">Justificativas</th>
               </tr>
             </thead>
             <tbody id="my-punches-list" class="divide-y divide-slate-100">
-              <tr><td colspan="9" class="p-4 text-center text-slate-400">Nenhum registro encontrado.</td></tr>
+              <tr><td colspan="10" class="p-4 text-center text-slate-400">Nenhum registro encontrado.</td></tr>
             </tbody>
           </table>
         </div>
@@ -192,7 +193,7 @@
         </button>
       </div>
 
-      <!-- NOVO: TABELA GERAL DIÁRIA (EXIBIDA AUTOMATICAMENTE SEM FILTRO) -->
+      <!-- TABELA GERAL DIÁRIA COM LOCALIZAÇÃO GPS -->
       <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
         <div class="flex justify-between items-center border-b border-slate-200 pb-3">
           <h3 class="font-bold text-slate-800 text-base flex items-center space-x-2">
@@ -217,17 +218,18 @@
                 <th class="p-3 text-purple-700">Ent. Plantão</th>
                 <th class="p-3 text-indigo-700">Saí. Plantão</th>
                 <th class="p-3 text-slate-900">Total Hoje</th>
+                <th class="p-3 text-teal-700">Localização (GPS)</th>
                 <th class="p-3">Justificativas do Dia</th>
               </tr>
             </thead>
             <tbody id="today-punches-body" class="divide-y divide-slate-100">
-              <tr><td colspan="9" class="p-4 text-center text-slate-400">A carregar registros do dia...</td></tr>
+              <tr><td colspan="10" class="p-4 text-center text-slate-400">A carregar registros do dia...</td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- ÁREA DE FILTROS E RELATÓRIO MENSAL INDIVIDUAL -->
+      <!-- ÁREA DE FILTROS E RELATÓRIO MENSAL INDIVIDUAL COM LOCALIZAÇÃO -->
       <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-6">
         <div class="border-b border-slate-200 pb-4">
           <h3 class="font-bold text-slate-800 text-base flex items-center space-x-2">
@@ -304,11 +306,12 @@
                 <th class="p-3 text-purple-700">Ent. Plantão</th>
                 <th class="p-3 text-indigo-700">Saí. Plantão</th>
                 <th class="p-3 text-slate-900">Total Dia</th>
+                <th class="p-3 text-teal-700">Localização (GPS)</th>
                 <th class="p-3">Justificativas e Observações</th>
               </tr>
             </thead>
             <tbody id="filtered-punches-body" class="divide-y divide-slate-100">
-              <tr><td colspan="9" class="p-4 text-center text-slate-400">Selecione um colaborador e clique em Filtrar para carregar os pontos.</td></tr>
+              <tr><td colspan="10" class="p-4 text-center text-slate-400">Selecione um colaborador e clique em Filtrar para carregar os pontos.</td></tr>
             </tbody>
           </table>
         </div>
@@ -584,7 +587,7 @@
 
       if (screenId === 'screen-coord') {
         loadVetsList();
-        loadTodayAllPunches(); // CARREGA AUTOMATICAMENTE A FREQUÊNCIA DE HOJE
+        loadTodayAllPunches();
       } else if (screenId === 'screen-report') {
         loadMyPunches();
       }
@@ -618,6 +621,7 @@
     document.getElementById('btn-cancel-punch').addEventListener('click', closeJustificationModal);
     document.getElementById('btn-cancel-punch-btn').addEventListener('click', closeJustificationModal);
 
+    // REGISTRA O PONTO CAPTURANDO AS COORDENADAS GPS DO DISPOSITIVO
     document.getElementById('btn-confirm-punch').addEventListener('click', async () => {
       if (!currentUser || !selectedPunchType) return;
       const justificationText = document.getElementById('punch-justification-input').value.trim();
@@ -627,9 +631,10 @@
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(async (pos) => {
           await savePunch(selectedPunchType, pos.coords.latitude, pos.coords.longitude, justificationText);
-        }, async () => {
+        }, async (error) => {
+          console.warn("GPS Indisponível/Negado:", error.message);
           await savePunch(selectedPunchType, null, null, justificationText);
-        });
+        }, { enableHighAccuracy: true, timeout: 10000 });
       } else {
         await savePunch(selectedPunchType, null, null, justificationText);
       }
@@ -651,6 +656,18 @@
       } catch (err) {
         alert("Erro ao registrar ponto: " + err.message);
       }
+    }
+
+    // FORMATA A COORDENADA COMO UM LINK INTERATIVO DO GOOGLE MAPS
+    function formatLocationLink(lat, lng) {
+      if (lat !== null && lat !== undefined && lng !== null && lng !== undefined) {
+        const mapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+        return `<a href="${mapsUrl}" target="_blank" class="text-teal-600 hover:text-teal-800 font-semibold underline flex items-center space-x-1">
+                  <i class="fa-solid fa-map-pin"></i>
+                  <span>${lat.toFixed(4)}, ${lng.toFixed(4)}</span>
+                </a>`;
+      }
+      return '<span class="text-slate-400 italic">GPS Indisponível</span>';
     }
 
     async function loadVetsList() {
@@ -710,7 +727,7 @@
       }
     }
 
-    // CARREGA TODOS OS PONTOS DO DIA ATUAL PARA TODOS OS COLABORADORES
+    // CARREGA A FREQUÊNCIA DE HOJE COM LOCALIZAÇÃO DE CADA PONTO
     async function loadTodayAllPunches() {
       const tbody = document.getElementById('today-punches-body');
       const dateLabel = document.getElementById('today-date-label');
@@ -719,12 +736,12 @@
       const todayStr = new Date().toLocaleDateString('pt-BR');
       if (dateLabel) dateLabel.innerText = todayStr;
 
-      tbody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">A carregar registros do dia...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="10" class="p-4 text-center text-slate-400">A carregar registros do dia...</td></tr>';
 
       try {
         const snap = await getDocs(collection(db, 'punches'));
         if (snap.empty) {
-          tbody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">Nenhum ponto registrado no sistema hoje.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="10" class="p-4 text-center text-slate-400">Nenhum ponto registrado no sistema hoje.</td></tr>';
           return;
         }
 
@@ -747,6 +764,7 @@
                 totalMs: 0,
                 inTime: null,
                 plantaoInTime: null,
+                locations: [],
                 justifications: []
               };
             }
@@ -783,6 +801,10 @@
               }
             }
 
+            if (p.latitude && p.longitude) {
+              todayUsers[userName].locations.push({ lat: p.latitude, lng: p.longitude, type });
+            }
+
             if (p.justification && p.justification.trim() !== '') {
               todayUsers[userName].justifications.push(`[${type}]: ${p.justification}`);
             }
@@ -793,7 +815,7 @@
         const userKeys = Object.keys(todayUsers);
 
         if (userKeys.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">Nenhum ponto registrado hoje até o momento.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="10" class="p-4 text-center text-slate-400">Nenhum ponto registrado hoje até o momento.</td></tr>';
           return;
         }
 
@@ -804,6 +826,12 @@
           const mins = totalMins % 60;
           const totalStr = `${hours}h ${mins < 10 ? '0' : ''}${mins}m`;
           const justStr = u.justifications.length > 0 ? `<span class="text-amber-700 font-semibold">${u.justifications.join(' | ')}</span>` : '<span class="text-slate-400 italic">-</span>';
+
+          // EXIBE AS LOCALIZAÇÕES DOS PONTOS DO DIA
+          let locHtml = '<span class="text-slate-400 italic">Sem GPS</span>';
+          if (u.locations.length > 0) {
+            locHtml = u.locations.map(loc => formatLocationLink(loc.lat, loc.lng)).join(' <br> ');
+          }
 
           const row = document.createElement('tr');
           row.className = "hover:bg-slate-50 border-b border-slate-100 font-mono";
@@ -816,6 +844,7 @@
             <td class="p-3 text-purple-700 font-semibold">${u.plantaoEntrada}</td>
             <td class="p-3 text-indigo-700 font-semibold">${u.plantaoSaida}</td>
             <td class="p-3 text-slate-900 font-bold bg-slate-50">${totalStr}</td>
+            <td class="p-3 font-sans text-xs">${locHtml}</td>
             <td class="p-3 font-sans text-xs">${justStr}</td>
           `;
           tbody.appendChild(row);
@@ -823,7 +852,7 @@
 
       } catch (err) {
         console.error("Erro ao carregar pontos do dia:", err);
-        tbody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-rose-500">Erro ao carregar dados do dia.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="p-4 text-center text-rose-500">Erro ao carregar dados do dia.</td></tr>';
       }
     }
 
@@ -845,6 +874,7 @@
             saida: '--:--',
             plantaoEntrada: '--:--',
             plantaoSaida: '--:--',
+            locations: [],
             justifications: [],
             totalMs: 0,
             inTime: null,
@@ -884,6 +914,10 @@
           }
         }
 
+        if (p.latitude && p.longitude) {
+          grouped[dateKey].locations.push({ lat: p.latitude, lng: p.longitude, type });
+        }
+
         if (p.justification && p.justification.trim() !== '') {
           grouped[dateKey].justifications.push(`[${type}]: ${p.justification}`);
         }
@@ -892,7 +926,7 @@
       return grouped;
     }
 
-    // PESQUISA COM FILTRO POR COLABORADOR
+    // PESQUISA MENSAL DO COLABORADOR COM COLUNA DE LOCALIZAÇÃO (MAPA)
     document.getElementById('btn-apply-filter').addEventListener('click', async () => {
       const vetId = document.getElementById('filter-vet').value;
       const targetMonth = parseInt(document.getElementById('filter-month').value);
@@ -908,7 +942,7 @@
 
       const selectedVet = allVetsList.find(v => v.id === vetId);
       vetNameDisplay.innerText = selectedVet ? `${selectedVet.name || selectedVet.email} - Mês ${targetMonth + 1}/${targetYear}` : '';
-      tableBody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">A buscar registros do colaborador...</td></tr>';
+      tableBody.innerHTML = '<tr><td colspan="10" class="p-4 text-center text-slate-400">A buscar registros do colaborador...</td></tr>';
 
       try {
         const q1 = query(collection(db, 'punches'), where('userId', '==', vetId));
@@ -924,7 +958,7 @@
         }
 
         if (rawPunches.length === 0) {
-          tableBody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">Nenhum ponto registrado para este colaborador.</td></tr>';
+          tableBody.innerHTML = '<tr><td colspan="10" class="p-4 text-center text-slate-400">Nenhum ponto registrado para este colaborador.</td></tr>';
           hoursDisplay.innerText = "00h 00m";
           return;
         }
@@ -940,7 +974,7 @@
         filteredPunches.sort((a, b) => a.dateObj - b.dateObj);
 
         if (filteredPunches.length === 0) {
-          tableBody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">Nenhum ponto encontrado no mês/ano selecionado.</td></tr>';
+          tableBody.innerHTML = '<tr><td colspan="10" class="p-4 text-center text-slate-400">Nenhum ponto encontrado no mês/ano selecionado.</td></tr>';
           hoursDisplay.innerText = "00h 00m";
           return;
         }
@@ -961,6 +995,11 @@
 
           const justStr = day.justifications.length > 0 ? `<span class="text-amber-700 font-semibold">${day.justifications.join(' | ')}</span>` : '<span class="text-slate-400 italic">-</span>';
 
+          let locHtml = '<span class="text-slate-400 italic">Sem GPS</span>';
+          if (day.locations.length > 0) {
+            locHtml = day.locations.map(loc => formatLocationLink(loc.lat, loc.lng)).join(' <br> ');
+          }
+
           const row = document.createElement('tr');
           row.className = "hover:bg-slate-50 border-b border-slate-100 font-mono";
           row.innerHTML = `
@@ -972,6 +1011,7 @@
             <td class="p-3 text-purple-700 font-semibold">${day.plantaoEntrada}</td>
             <td class="p-3 text-indigo-700 font-semibold">${day.plantaoSaida}</td>
             <td class="p-3 text-slate-900 font-bold bg-slate-50">${dayTotalStr}</td>
+            <td class="p-3 font-sans text-xs">${locHtml}</td>
             <td class="p-3 font-sans text-xs">${justStr}</td>
           `;
           tableBody.appendChild(row);
@@ -984,7 +1024,7 @@
 
       } catch (err) {
         console.error("Erro ao consultar pontos:", err);
-        tableBody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-rose-500 font-semibold">Erro ao consultar histórico: ${err.message}</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-rose-500 font-semibold">Erro ao consultar histórico: ${err.message}</td></tr>`;
       }
     });
 
@@ -1070,7 +1110,7 @@
       const listEl = document.getElementById('my-punches-list');
       if (!listEl || !currentUser) return;
 
-      listEl.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">A carregar registros...</td></tr>';
+      listEl.innerHTML = '<tr><td colspan="10" class="p-4 text-center text-slate-400">A carregar registros...</td></tr>';
 
       try {
         const q = query(collection(db, 'punches'), where('userId', '==', currentUser.uid));
@@ -1078,7 +1118,7 @@
         listEl.innerHTML = '';
 
         if (snap.empty) {
-          listEl.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">Nenhum registro encontrado.</td></tr>';
+          listEl.innerHTML = '<tr><td colspan="10" class="p-4 text-center text-slate-400">Nenhum registro encontrado.</td></tr>';
           return;
         }
 
@@ -1101,6 +1141,11 @@
 
           const justStr = day.justifications.length > 0 ? `<span class="text-amber-700 font-semibold">${day.justifications.join(' | ')}</span>` : '<span class="text-slate-400 italic">-</span>';
 
+          let locHtml = '<span class="text-slate-400 italic">Sem GPS</span>';
+          if (day.locations.length > 0) {
+            locHtml = day.locations.map(loc => formatLocationLink(loc.lat, loc.lng)).join(' <br> ');
+          }
+
           const row = document.createElement('tr');
           row.className = "hover:bg-slate-50 border-b border-slate-100 font-mono";
           row.innerHTML = `
@@ -1112,6 +1157,7 @@
             <td class="p-3 text-purple-700 font-semibold">${day.plantaoEntrada}</td>
             <td class="p-3 text-indigo-700 font-semibold">${day.plantaoSaida}</td>
             <td class="p-3 text-slate-900 font-bold bg-slate-50">${dayTotalStr}</td>
+            <td class="p-3 font-sans text-xs">${locHtml}</td>
             <td class="p-3 font-sans text-xs">${justStr}</td>
           `;
           listEl.appendChild(row);
